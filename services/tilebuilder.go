@@ -2,28 +2,64 @@ package services
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"log/slog"
 	"os"
-	"path/filepath"
 	"time"
 )
 
 type TileBuilder struct {
-	ConfigDir string
+	concurrency  int
+	maxCacheSize int64
+
+	path        string
+	tilesPath   string
+	extractPath string
+	configPath  string
+	adminPath   string
+	datasetPath string
+
+	configCreated bool
 
 	logger   *slog.Logger
 	executor *executor
 }
 
-type mjolnirConfig struct {
-	TileDir string `json:"tile_dir"`
+type TileBuilderOptions struct {
+	Debug bool
+
+	MaxCacheSize int64
+	Concurrency  int
+	Path         string
+	Dataset      string
 }
 
-func NewValhallaExecutor(configDir string, logger *slog.Logger, debug bool) (*TileBuilder, error) {
-	executor := &executor{logger: logger, debug: debug}
+func createPathIfNotExists(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err = os.MkdirAll(path, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func NewTileBuilder(
+	opts *TileBuilderOptions,
+	logger *slog.Logger) (*TileBuilder, error) {
+	if opts.Path == "" {
+		return nil, fmt.Errorf("missing path input")
+	}
+
+	if opts.Dataset == "" {
+		return nil, fmt.Errorf("missing dataset input")
+	}
+
+	executor := &executor{
+		logger: logger,
+		debug:  opts.Debug,
+	}
 	if !executor.hasExecutable("valhalla_build_tiles") {
 		return nil, fmt.Errorf("missing executable: valhalla_build_tiles")
 	}
@@ -36,56 +72,151 @@ func NewValhallaExecutor(configDir string, logger *slog.Logger, debug bool) (*Ti
 		return nil, fmt.Errorf("missing executable: valhalla_build_admins")
 	}
 
-	if _, err := os.Stat(configDir); os.IsNotExist(err) {
-		return nil, err
+	if !executor.hasExecutable("valhalla_build_config") {
+		return nil, fmt.Errorf("missing executable: valhalla_build_config")
 	}
 
-	configFile, err := os.Open(configDir)
+	builder := &TileBuilder{executor: executor, logger: logger}
+	err := createPathIfNotExists(opts.Path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating basepath: %d", err)
 	}
-	defer configFile.Close()
+	builder.path = opts.Path
 
-	byteValue, err := io.ReadAll(configFile)
+	tilesPath := opts.Path + "/valhalla_tiles"
+	err = createPathIfNotExists(opts.Path + "/valhalla_tiles")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating valhalla_tiles path: %s", err)
+	}
+	builder.tilesPath = tilesPath
+
+	builder.extractPath = builder.path + "/valhalla_tiles.tar"
+	builder.adminPath = builder.tilesPath + "/admin.sqlite"
+	builder.configPath = builder.path + "/valhalla.json"
+
+	builder.datasetPath = builder.path + "/" + opts.Dataset
+	if _, err := os.Stat(builder.datasetPath); os.IsNotExist(err) {
+		return nil, fmt.Errorf("dataset: %s, does not exist", builder.datasetPath)
 	}
 
-	configFileDir, _ := filepath.Split(configDir)
+	builder.concurrency = opts.Concurrency
+	builder.maxCacheSize = opts.MaxCacheSize
 
-	var config map[string]mjolnirConfig
-	err = json.Unmarshal([]byte(byteValue), &config)
-	if err != nil {
-		return nil, err
-	}
-
-	_, tilesDir := filepath.Split(config["mjolnir"].TileDir)
-	if _, err := os.Stat(configFileDir + "/" + tilesDir); os.IsNotExist(err) {
-		logger.Info("could not find tile directory: " + tilesDir + ", creating..")
-		err = os.Mkdir(tilesDir, os.ModePerm)
-		if err != nil {
-			logger.Error("could not create tile directory: ", err)
-			return nil, err
-		}
-		logger.Info("successfully created tile directory: " + tilesDir)
-	}
-	return &TileBuilder{executor: executor, logger: logger, ConfigDir: configDir}, nil
+	return builder, nil
 }
 
-func (ve *TileBuilder) BuildTiles(ctx context.Context, args []string) error {
+func (ve *TileBuilder) GetConfigPath() string {
+	return ve.configPath
+}
+
+func (ve *TileBuilder) GetTilePath() string {
+	return ve.tilesPath
+}
+
+func (ve *TileBuilder) GetExtractPath() string {
+	return ve.extractPath
+}
+
+func (ve *TileBuilder) GetAdminPath() string {
+	return ve.adminPath
+}
+
+func (ve *TileBuilder) GetDatasetPath() string {
+	return ve.adminPath
+}
+
+func (ve *TileBuilder) GetConcurrency() int {
+	return ve.concurrency
+}
+
+func (ve *TileBuilder) GetMaxCacheSize() int64 {
+	return ve.maxCacheSize
+}
+
+func (ve *TileBuilder) BuildConfig(ctx context.Context) error {
+	start := time.Now()
+	args := []string{
+		"--mjolnir-concurrency", fmt.Sprint(ve.concurrency),
+		"--mjolnir-max-cache-size", fmt.Sprint(ve.maxCacheSize),
+		"--mjolnir-tile-dir", ve.tilesPath,
+		"--mjolnir-tile-extract", ve.extractPath,
+		"--mjolnir-admin", ve.adminPath,
+	}
+
+	ve.logger.Info("creating valhalla config", "args", args)
+
+	output, err := ve.executor.executeWithOutput(ctx, "valhalla_build_config", args)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(ve.configPath, output, 0644)
+	if err != nil {
+		return fmt.Errorf("error creating valhalla config: %s", err)
+	}
+
+	if _, err := os.Stat(ve.configPath); os.IsNotExist(err) {
+		return fmt.Errorf("error creating valhalla config: %s", err)
+	}
+
+	ve.configCreated = true
+
+	elapsed := time.Since(start)
+	ve.logger.Info(
+		"finished creating valhalla config",
+		"args", args,
+		"elapsed", elapsed.String(),
+	)
+
+	return nil
+}
+
+func (ve *TileBuilder) BuildTiles(ctx context.Context) error {
+	if !ve.configCreated {
+		return fmt.Errorf("error, create config first")
+	}
+
 	start := time.Now()
 
-	a := append([]string{"--config=" + ve.ConfigDir}, args...)
-	ve.logger.Info("starting tile builder.", "args", a)
+	args := []string{"--config", ve.configPath, ve.datasetPath}
+	ve.logger.Info("started creating tiles", "args", args)
 
-	err := ve.executor.execute(ctx, "valhalla_build_tiles", a)
+	err := ve.executor.execute(ctx, "valhalla_build_tiles", args)
 	if err != nil {
-		ve.logger.Error("cannot execute valhalla_build_tiles: ", "err", err)
 		return err
 	}
 
 	elapsed := time.Since(start)
-	ve.logger.Info("starting tile builder.", "args", a, "elapsed", elapsed.String())
+	ve.logger.Info(
+		"finished creating tiles",
+		"args", args,
+		"elapsed", elapsed.String(),
+	)
+
+	return nil
+}
+
+func (ve *TileBuilder) BuildTilesExtract(ctx context.Context) error {
+	if !ve.configCreated {
+		return fmt.Errorf("error, create config first")
+	}
+
+	start := time.Now()
+
+	args := []string{"--config", ve.configPath, "-O"}
+	ve.logger.Info("started tarballing tiles extract", "args", args)
+
+	err := ve.executor.execute(ctx, "valhalla_build_extract", args)
+	if err != nil {
+		return err
+	}
+
+	elapsed := time.Since(start)
+	ve.logger.Info(
+		"finished tarballing tile extract",
+		"args", args,
+		"elapsed", elapsed.String(),
+	)
 
 	return nil
 }
