@@ -23,7 +23,7 @@ func NewGeofabrikDownloader(
 }
 
 func (od *GeofabrikDownloader) Get(ctx context.Context) error {
-	g, err := geofabrik.New("http://download.geofabrik.de", false)
+	g, err := geofabrik.New("http://download.geofabrik.de")
 	if err != nil {
 		return fmt.Errorf("cannot instantiate geofabrik: %w", err)
 	}
