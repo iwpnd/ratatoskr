@@ -1,4 +1,4 @@
-package services
+package tiles
 
 import (
 	"context"
@@ -95,9 +95,9 @@ func NewTileBuilder(
 	builder.configPath = builder.path + "/valhalla.json"
 
 	builder.datasetPath = builder.path + "/" + opts.Dataset
-	if _, err := os.Stat(builder.datasetPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("dataset: %s, does not exist", builder.datasetPath)
-	}
+	// if _, err := os.Stat(builder.datasetPath); os.IsNotExist(err) {
+	// 	return nil, fmt.Errorf("dataset: %s, does not exist", builder.datasetPath)
+	// }
 
 	builder.concurrency = opts.Concurrency
 	builder.maxCacheSize = opts.MaxCacheSize
