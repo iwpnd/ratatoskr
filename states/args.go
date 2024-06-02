@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/iwpnd/valhalla-builder/services"
+	"github.com/iwpnd/valhalla-builder/services/download"
+	"github.com/iwpnd/valhalla-builder/services/tiles"
 )
 
 type Args struct {
 	Name string
 
-	BlobStore services.BlobStorer
-	FileStore services.FileStorer
+	Downloader *download.GeofabrikDownloader
+	Builder    *tiles.TileBuilder
 
 	Logger *slog.Logger
 }
@@ -25,10 +26,10 @@ func (a Args) validate(ctx context.Context) error {
 	if a.Name == "" {
 		return fmt.Errorf("name cannot be empty string")
 	}
-	if a.BlobStore == nil {
+	if a.Downloader == nil {
 		return fmt.Errorf("services cannot be nil")
 	}
-	if a.FileStore == nil {
+	if a.Builder == nil {
 		return fmt.Errorf("services cannot be nil")
 	}
 	if a.Logger == nil {

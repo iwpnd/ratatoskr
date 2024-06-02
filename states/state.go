@@ -9,7 +9,7 @@ func Execute(ctx context.Context, args Args) error {
 		return err
 	}
 
-	start := startState
+	start := downloadState
 	_, err := run(ctx, args, start)
 	if err != nil {
 		return err
