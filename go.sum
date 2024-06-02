@@ -1,0 +1,4 @@
+github.com/iwpnd/go-geofabrik v0.2.0 h1:0R7cVjjpIksKzEgzbduQv0UoTiyu9HKQCz6WLhA+aOE=
+github.com/iwpnd/go-geofabrik v0.2.0/go.mod h1:iy09pXCz8yQ9N6CMHKvCDef20kI86tpR92WdjkmCXJk=
+github.com/iwpnd/rip v0.5.0 h1:BYIf4m+5lZjhQL03BpqdWiKCOdelB+UmSDmfJKaIkhU=
+github.com/iwpnd/rip v0.5.0/go.mod h1:LkG8onQkvePn8ooHKRDHstPpWc61v+2mWa6S25n7Hic=

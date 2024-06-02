@@ -1,2 +1,4 @@
 bin/tmp
+**/data
 .DS_Store
+duplicateways.txt
