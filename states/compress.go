@@ -11,9 +11,10 @@ func compressState(ctx context.Context, args Args) (Args, State[Args], error) {
 
 	args.Logger.Info("starting compression state", "name", args.Name)
 
+	archive := args.Builder.GetPath() + "/valhalla_tiles"
 	err := args.Compressor.Compress(
 		ctx,
-		"valhalla_tiles",
+		archive,
 		args.Builder.GetExtractPath(),
 		args.Builder.GetAdminPath(),
 	)
@@ -22,6 +23,6 @@ func compressState(ctx context.Context, args Args) (Args, State[Args], error) {
 		return args, nil, err
 	}
 
-	args.Logger.Info("successfully finished compression state", "name", args.Name)
+	args.Logger.Info("successfully finished compression state", "name", args.Name, "archive", archive)
 	return args, nil, nil
 }

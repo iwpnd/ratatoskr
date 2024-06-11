@@ -63,7 +63,7 @@ func appendToArchive(ctx context.Context, tw *tar.Writer, filename string) error
 }
 
 func (gz *GzipCompressor) Compress(ctx context.Context, archive string, files ...string) error {
-	out, err := os.Create(archive + "tar.gz")
+	out, err := os.Create(archive + ".tar.gz")
 	if err != nil {
 		return err
 	}
