@@ -149,7 +149,6 @@ func (ve *TileBuilder) GetMaxCacheSize() int64 {
 }
 
 func (ve *TileBuilder) BuildConfig(ctx context.Context) error {
-	start := time.Now()
 	args := []string{
 		"--mjolnir-concurrency", fmt.Sprint(ve.concurrency),
 		"--mjolnir-max-cache-size", fmt.Sprint(ve.maxCacheSize),
@@ -176,11 +175,9 @@ func (ve *TileBuilder) BuildConfig(ctx context.Context) error {
 
 	ve.configCreated = true
 
-	elapsed := time.Since(start)
 	ve.logger.Info(
 		"finished creating valhalla config",
 		"args", args,
-		"elapsed", elapsed.String(),
 	)
 
 	return nil
@@ -191,8 +188,6 @@ func (ve *TileBuilder) BuildTiles(ctx context.Context) error {
 		return fmt.Errorf("error, create config first")
 	}
 
-	start := time.Now()
-
 	args := []string{"--config", ve.configPath, ve.datasetPath}
 	ve.logger.Info("started creating tiles", "args", args)
 
@@ -201,11 +196,9 @@ func (ve *TileBuilder) BuildTiles(ctx context.Context) error {
 		return err
 	}
 
-	elapsed := time.Since(start)
 	ve.logger.Info(
 		"finished creating tiles",
 		"args", args,
-		"elapsed", elapsed.String(),
 	)
 
 	return nil
@@ -241,8 +234,6 @@ func (ve *TileBuilder) BuildAdmins(ctx context.Context) error {
 		return fmt.Errorf("error, create config first")
 	}
 
-	start := time.Now()
-
 	args := []string{"--config", ve.configPath, ve.datasetPath}
 	ve.logger.Info("started building admins", "args", args)
 
@@ -251,11 +242,9 @@ func (ve *TileBuilder) BuildAdmins(ctx context.Context) error {
 		return err
 	}
 
-	elapsed := time.Since(start)
 	ve.logger.Info(
 		"finished building admins",
 		"args", args,
-		"elapsed", elapsed.String(),
 	)
 
 	return nil

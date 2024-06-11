@@ -2,6 +2,7 @@ package states
 
 import (
 	"context"
+	"time"
 )
 
 func compressState(ctx context.Context, args Args) (Args, State[Args], error) {
@@ -10,6 +11,7 @@ func compressState(ctx context.Context, args Args) (Args, State[Args], error) {
 	}
 
 	args.Logger.Info("starting compression state", "name", args.Name)
+	start := time.Now()
 
 	archive := args.Builder.GetPath() + "/valhalla_tiles"
 	err := args.Compressor.Compress(
@@ -23,6 +25,13 @@ func compressState(ctx context.Context, args Args) (Args, State[Args], error) {
 		return args, nil, err
 	}
 
-	args.Logger.Info("successfully finished compression state", "name", args.Name, "archive", archive)
+	elapsed := time.Since(start)
+	args.Logger.Info(
+		"successfully finished compression state",
+		"name",
+		args.Name,
+		"archive", archive,
+		"elapsed", elapsed.String(),
+	)
 	return args, nil, nil
 }
