@@ -8,6 +8,20 @@ import (
 	"time"
 )
 
+type Builder interface {
+	BuildConfig(context.Context) error
+	BuildTiles(context.Context) error
+	BuildTilesExtract(context.Context) error
+	BuildAdmins(context.Context) error
+	GetPath() string
+	GetAdminPath() string
+	GetExtractPath() string
+	GetTilePath() string
+	GetConfigPath() string
+	GetMaxCacheSize() int64
+	GetConcurrency() int
+}
+
 type TileBuilder struct {
 	concurrency  int
 	maxCacheSize int64
@@ -100,6 +114,10 @@ func NewTileBuilder(
 	builder.maxCacheSize = opts.MaxCacheSize
 
 	return builder, nil
+}
+
+func (ve *TileBuilder) GetPath() string {
+	return ve.path
 }
 
 func (ve *TileBuilder) GetConfigPath() string {

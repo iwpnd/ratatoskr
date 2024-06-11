@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/iwpnd/valhalla-builder/services/compress"
 	"github.com/iwpnd/valhalla-builder/services/download"
 	"github.com/iwpnd/valhalla-builder/services/tiles"
 )
@@ -12,8 +13,9 @@ import (
 type Args struct {
 	Name string
 
-	Downloader *download.GeofabrikDownloader
-	Builder    *tiles.TileBuilder
+	Downloader download.Downloader
+	Builder    tiles.Builder
+	Compressor compress.Compressor
 
 	Logger *slog.Logger
 }

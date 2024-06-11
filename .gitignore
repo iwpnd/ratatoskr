@@ -1,4 +1,4 @@
-bin/tmp
+bin/
 **/data
 .DS_Store
 duplicateways.txt
