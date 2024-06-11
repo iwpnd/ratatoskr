@@ -21,6 +21,11 @@ type GeofabrikDownloader struct {
 	opts GeofabrikDownloaderOptions
 }
 
+func fileExists(filepath string) bool {
+	_, err := os.Stat(filepath)
+	return errors.Is(err, fs.ErrNotExist)
+}
+
 func NewGeofabrikDownloader(
 	opts GeofabrikDownloaderOptions,
 ) *GeofabrikDownloader {
@@ -34,10 +39,10 @@ func (od *GeofabrikDownloader) Get(ctx context.Context) error {
 	}
 
 	filePath := od.opts.OutputPath + "/" + od.opts.Dataset
-	if _, err := os.Stat(filePath); errors.Is(err, fs.ErrNotExist) {
-		if !od.opts.ForceDownload {
-			return nil
-		}
+	exists := fileExists(filePath)
+
+	if exists && !od.opts.ForceDownload {
+		return nil
 	}
 
 	err = g.Download(ctx, od.opts.Dataset, od.opts.OutputPath)
