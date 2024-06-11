@@ -13,5 +13,5 @@ func buildState(ctx context.Context, args Args) (Args, State[Args], error) {
 	}
 
 	args.Logger.Info("successfully finished build state", "name", args.Name)
-	return args, extractState, nil
+	return args, adminState, nil
 }

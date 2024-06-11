@@ -91,13 +91,10 @@ func NewTileBuilder(
 	builder.tilesPath = tilesPath
 
 	builder.extractPath = builder.path + "/valhalla_tiles.tar"
-	builder.adminPath = builder.tilesPath + "/admin.sqlite"
+	builder.adminPath = builder.path + "/admin.sqlite"
 	builder.configPath = builder.path + "/valhalla.json"
 
 	builder.datasetPath = builder.path + "/" + opts.Dataset
-	// if _, err := os.Stat(builder.datasetPath); os.IsNotExist(err) {
-	// 	return nil, fmt.Errorf("dataset: %s, does not exist", builder.datasetPath)
-	// }
 
 	builder.concurrency = opts.Concurrency
 	builder.maxCacheSize = opts.MaxCacheSize
@@ -214,6 +211,31 @@ func (ve *TileBuilder) BuildTilesExtract(ctx context.Context) error {
 	elapsed := time.Since(start)
 	ve.logger.Info(
 		"finished tarballing tile extract",
+		"args", args,
+		"elapsed", elapsed.String(),
+	)
+
+	return nil
+}
+
+func (ve *TileBuilder) BuildAdmins(ctx context.Context) error {
+	if !ve.configCreated {
+		return fmt.Errorf("error, create config first")
+	}
+
+	start := time.Now()
+
+	args := []string{"--config", ve.configPath, ve.datasetPath}
+	ve.logger.Info("started building admins", "args", args)
+
+	err := ve.executor.execute(ctx, "valhalla_build_admins", args)
+	if err != nil {
+		return err
+	}
+
+	elapsed := time.Since(start)
+	ve.logger.Info(
+		"finished building admins",
 		"args", args,
 		"elapsed", elapsed.String(),
 	)
