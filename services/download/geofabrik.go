@@ -11,10 +11,9 @@ import (
 )
 
 type GeofabrikDownloaderOptions struct {
-	Url           string
-	Dataset       string
-	OutputPath    string
-	ForceDownload bool
+	Url        string
+	Dataset    string
+	OutputPath string
 }
 
 type GeofabrikDownloader struct {
@@ -36,13 +35,6 @@ func (od *GeofabrikDownloader) Get(ctx context.Context) error {
 	g, err := geofabrik.New(od.opts.Url)
 	if err != nil {
 		return fmt.Errorf("cannot instantiate geofabrik: %w", err)
-	}
-
-	filePath := od.opts.OutputPath + "/" + od.opts.Dataset
-	exists := fileExists(filePath)
-
-	if exists && !od.opts.ForceDownload {
-		return nil
 	}
 
 	err = g.Download(ctx, od.opts.Dataset, od.opts.OutputPath)

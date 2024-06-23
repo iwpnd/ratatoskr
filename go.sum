@@ -4,6 +4,8 @@ github.com/iwpnd/go-geofabrik v0.2.0 h1:0R7cVjjpIksKzEgzbduQv0UoTiyu9HKQCz6WLhA+
 github.com/iwpnd/go-geofabrik v0.2.0/go.mod h1:iy09pXCz8yQ9N6CMHKvCDef20kI86tpR92WdjkmCXJk=
 github.com/iwpnd/go-geofabrik v0.3.0 h1:imMjJGLWRrBMpYCMEX4Kvc4xS7zhJfSuImBNE3gYxjM=
 github.com/iwpnd/go-geofabrik v0.3.0/go.mod h1:GA2J7nwrC5wLW6IWD+8NVu2PP7sYeW/dcu+poe0yjqs=
+github.com/iwpnd/go-geofabrik v0.4.1 h1:oAsulspzwf6RQ6NlC9vCuSPBKjJyLFv4dICORzUsKro=
+github.com/iwpnd/go-geofabrik v0.4.1/go.mod h1:GA2J7nwrC5wLW6IWD+8NVu2PP7sYeW/dcu+poe0yjqs=
 github.com/iwpnd/rip v0.5.0 h1:BYIf4m+5lZjhQL03BpqdWiKCOdelB+UmSDmfJKaIkhU=
 github.com/iwpnd/rip v0.5.0/go.mod h1:LkG8onQkvePn8ooHKRDHstPpWc61v+2mWa6S25n7Hic=
 github.com/iwpnd/rip v0.7.0 h1:fWDxSjjxEmfa/qh84ZAl5jwh4rFHEKCMQ5Wxr5GlsLI=
