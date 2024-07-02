@@ -28,14 +28,11 @@ func (a Args) validate(ctx context.Context) error {
 	if a.Name == "" {
 		return fmt.Errorf("during Args validation: name cannot be empty string")
 	}
-	if a.Downloader == nil {
-		return fmt.Errorf("during Args validation: services cannot be nil")
+	if a.Logger == nil {
+		return fmt.Errorf("during Args validation: logger cannot be nil")
 	}
 	if a.Builder == nil {
-		return fmt.Errorf("during Args validation: services cannot be nil")
-	}
-	if a.Logger == nil {
-		return fmt.Errorf("during Args validation: services cannot be nil")
+		return fmt.Errorf("during Args validation: builder cannot be nil")
 	}
 
 	return nil

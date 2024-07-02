@@ -67,6 +67,14 @@ func TestCompressState(t *testing.T) {
 			expectErr: false,
 			wantState: nil,
 		},
+		{
+			name: "No Compressor defined",
+			args: Args{
+				Logger: logger,
+			},
+			expectErr: false,
+			wantState: nil,
+		},
 	}
 
 	for _, test := range tests {

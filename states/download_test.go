@@ -72,6 +72,14 @@ func TestDownloadState(t *testing.T) {
 			expectErr: false,
 			wantState: configState,
 		},
+		{
+			name: "No Downloader defined",
+			args: Args{
+				Logger: logger,
+			},
+			expectErr: false,
+			wantState: configState,
+		},
 	}
 
 	for _, test := range tests {
