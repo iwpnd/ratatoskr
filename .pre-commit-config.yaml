@@ -1,10 +1,11 @@
 repos:
-- repo: https://github.com/dnephin/pre-commit-golang
-  rev: v0.5.1
+- repo: https://github.com/TekWizely/pre-commit-golang
+  rev: v1.0.0-rc.1
   hooks:
     - id: go-fmt
-    - id: go-vet
-    - id: golangci-lint
+      args: [-w]
+    - id: go-vet-mod
+    - id: golangci-lint-mod
     - id: go-imports
     - id: go-mod-tidy
 - repo: https://github.com/jorisroovers/gitlint

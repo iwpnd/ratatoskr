@@ -20,7 +20,7 @@ type GeofabrikDownloader struct {
 	opts GeofabrikDownloaderOptions
 }
 
-func fileExists(filepath string) bool {
+func FileExists(filepath string) bool {
 	_, err := os.Stat(filepath)
 	return errors.Is(err, fs.ErrNotExist)
 }
