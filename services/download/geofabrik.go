@@ -42,5 +42,9 @@ func (od *GeofabrikDownloader) Get(ctx context.Context) error {
 		return fmt.Errorf("failed download from geofabrik dataset %s: %w", od.opts.Dataset, err)
 	}
 
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+
 	return nil
 }
