@@ -6,10 +6,11 @@ import (
 )
 
 func downloadState(ctx context.Context, args Args) (Args, State[Args], error) {
-	args.Logger.Info("starting download state", "name", args.Name)
 	if args.Downloader == nil {
 		return args, configState, nil
 	}
+
+	args.Logger.Info("starting download state", "name", args.Name)
 
 	start := time.Now()
 
