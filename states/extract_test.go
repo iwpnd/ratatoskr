@@ -25,13 +25,13 @@ func TestExtractState(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		args      Args
+		params    Params
 		expectErr bool
-		wantState State[Args]
+		wantState State[Params]
 	}{
 		{
 			name: "TileBuilder.BuildTilesExtract returns an Error",
-			args: Args{
+			params: Params{
 				Logger: logger,
 				Builder: &TestTileBuilder{
 					buildtilesextract: fmt.Errorf("error during building extract"),
@@ -41,7 +41,7 @@ func TestExtractState(t *testing.T) {
 		},
 		{
 			name: "extractState returns compressState",
-			args: Args{
+			params: Params{
 				Logger:  logger,
 				Builder: &TestTileBuilder{},
 			},
@@ -51,7 +51,7 @@ func TestExtractState(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		_, nextState, err := extractState(ctx, test.args)
+		_, nextState, err := extractState(ctx, test.params)
 		switch {
 		case err == nil && test.expectErr:
 			t.Errorf("TestExtractState - %s: got err == nil, want err != nil", test.name)

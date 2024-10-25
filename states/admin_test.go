@@ -25,13 +25,13 @@ func TestAdminState(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		args      Args
+		params    Params
 		expectErr bool
-		wantState State[Args]
+		wantState State[Params]
 	}{
 		{
 			name: "TileBuilder.BuildAdmins returns an Error",
-			args: Args{
+			params: Params{
 				Logger: logger,
 				Builder: &TestTileBuilder{
 					buildadmins: fmt.Errorf("error during building admins"),
@@ -41,7 +41,7 @@ func TestAdminState(t *testing.T) {
 		},
 		{
 			name: "adminState returns extractState",
-			args: Args{
+			params: Params{
 				Logger:  logger,
 				Builder: &TestTileBuilder{},
 			},
@@ -51,7 +51,7 @@ func TestAdminState(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		_, nextState, err := adminState(ctx, test.args)
+		_, nextState, err := adminState(ctx, test.params)
 		switch {
 		case err == nil && test.expectErr:
 			t.Errorf("TestAdminState - %s: got err == nil, want err != nil", test.name)

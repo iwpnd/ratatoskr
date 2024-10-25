@@ -5,25 +5,25 @@ import (
 	"time"
 )
 
-func downloadState(ctx context.Context, args Args) (Args, State[Args], error) {
-	if args.Downloader == nil {
-		return args, configState, nil
+func downloadState(ctx context.Context, params Params) (Params, State[Params], error) {
+	if params.Downloader == nil {
+		return params, configState, nil
 	}
 
-	args.Logger.Info("starting download state", "name", args.Name)
+	params.Logger.Info("starting download state", "name", params.Name)
 
 	start := time.Now()
 
-	err := args.Downloader.Get(ctx)
+	err := params.Downloader.Get(ctx)
 	if err != nil {
-		return args, nil, &StateError{State: DownloadState, Err: err}
+		return params, nil, &StateError{State: DownloadState, Err: err}
 	}
 
 	elapsed := time.Since(start)
-	args.Logger.Info(
+	params.Logger.Info(
 		"successfully finished download state",
-		"name", args.Name,
+		"name", params.Name,
 		"elapsed", elapsed.String(),
 	)
-	return args, configState, nil
+	return params, configState, nil
 }

@@ -34,34 +34,34 @@ func (s States) String() string {
 	}
 }
 
-func Execute(ctx context.Context, args Args) error {
-	if err := args.validate(ctx); err != nil {
+type State[T any] func(ctx context.Context, params T) (T, State[T], error)
+
+func Execute(ctx context.Context, params Params) error {
+	if err := params.validate(ctx); err != nil {
 		return err
 	}
 
 	start := downloadState
-	_, err := run(ctx, args, start)
+	_, err := run(ctx, params, start)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-type State[T any] func(ctx context.Context, args T) (T, State[T], error)
-
-func run[T any](ctx context.Context, args T, start State[T]) (T, error) {
+func run[T any](ctx context.Context, params T, start State[T]) (T, error) {
 	var err error
 	current := start
 	for {
 		if ctx.Err() != nil {
-			return args, ctx.Err()
+			return params, ctx.Err()
 		}
-		args, current, err = current(ctx, args)
+		params, current, err = current(ctx, params)
 		if err != nil {
-			return args, err
+			return params, err
 		}
 		if current == nil {
-			return args, nil
+			return params, nil
 		}
 	}
 }

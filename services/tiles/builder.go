@@ -149,7 +149,7 @@ func (ve *TileBuilder) GetMaxCacheSize() int64 {
 }
 
 func (ve *TileBuilder) BuildConfig(ctx context.Context) error {
-	args := []string{
+	params := []string{
 		"--mjolnir-concurrency", fmt.Sprint(ve.concurrency),
 		"--mjolnir-max-cache-size", fmt.Sprint(ve.maxCacheSize),
 		"--mjolnir-tile-dir", ve.tilesPath,
@@ -157,9 +157,9 @@ func (ve *TileBuilder) BuildConfig(ctx context.Context) error {
 		"--mjolnir-admin", ve.adminPath,
 	}
 
-	ve.logger.Info("creating valhalla config", "args", args)
+	ve.logger.Info("creating valhalla config", "params", params)
 
-	output, err := ve.executor.executeWithOutput(ctx, "valhalla_build_config", args)
+	output, err := ve.executor.executeWithOutput(ctx, "valhalla_build_config", params)
 	if err != nil {
 		return err
 	}
@@ -177,7 +177,7 @@ func (ve *TileBuilder) BuildConfig(ctx context.Context) error {
 
 	ve.logger.Info(
 		"finished creating valhalla config",
-		"args", args,
+		"params", params,
 	)
 
 	return nil
@@ -188,17 +188,17 @@ func (ve *TileBuilder) BuildTiles(ctx context.Context) error {
 		return fmt.Errorf("error, create config first")
 	}
 
-	args := []string{"--config", ve.configPath, ve.datasetPath}
-	ve.logger.Info("started creating tiles", "args", args)
+	params := []string{"--config", ve.configPath, ve.datasetPath}
+	ve.logger.Info("started creating tiles", "params", params)
 
-	err := ve.executor.execute(ctx, "valhalla_build_tiles", args)
+	err := ve.executor.execute(ctx, "valhalla_build_tiles", params)
 	if err != nil {
 		return err
 	}
 
 	ve.logger.Info(
 		"finished creating tiles",
-		"args", args,
+		"params", params,
 	)
 
 	return nil
@@ -211,10 +211,10 @@ func (ve *TileBuilder) BuildTilesExtract(ctx context.Context) error {
 
 	start := time.Now()
 
-	args := []string{"--config", ve.configPath, "-O"}
-	ve.logger.Info("started tarballing tiles extract", "args", args)
+	params := []string{"--config", ve.configPath, "-O"}
+	ve.logger.Info("started tarballing tiles extract", "params", params)
 
-	err := ve.executor.execute(ctx, "valhalla_build_extract", args)
+	err := ve.executor.execute(ctx, "valhalla_build_extract", params)
 	if err != nil {
 		return err
 	}
@@ -222,7 +222,7 @@ func (ve *TileBuilder) BuildTilesExtract(ctx context.Context) error {
 	elapsed := time.Since(start)
 	ve.logger.Info(
 		"finished tarballing tile extract",
-		"args", args,
+		"params", params,
 		"elapsed", elapsed.String(),
 	)
 
@@ -234,17 +234,17 @@ func (ve *TileBuilder) BuildAdmins(ctx context.Context) error {
 		return fmt.Errorf("error, create config first")
 	}
 
-	args := []string{"--config", ve.configPath, ve.datasetPath}
-	ve.logger.Info("started building admins", "args", args)
+	params := []string{"--config", ve.configPath, ve.datasetPath}
+	ve.logger.Info("started building admins", "params", params)
 
-	err := ve.executor.execute(ctx, "valhalla_build_admins", args)
+	err := ve.executor.execute(ctx, "valhalla_build_admins", params)
 	if err != nil {
 		return err
 	}
 
 	ve.logger.Info(
 		"finished building admins",
-		"args", args,
+		"params", params,
 	)
 
 	return nil

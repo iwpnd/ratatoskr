@@ -10,7 +10,7 @@ import (
 	"github.com/iwpnd/valhalla-builder/services/tiles"
 )
 
-type Args struct {
+type Params struct {
 	Name string
 
 	Downloader download.Downloader
@@ -20,18 +20,18 @@ type Args struct {
 	Logger *slog.Logger
 }
 
-func (a Args) validate(ctx context.Context) error {
+func (p Params) validate(ctx context.Context) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
 
-	if a.Name == "" {
+	if p.Name == "" {
 		return fmt.Errorf("during Args validation: name cannot be empty string")
 	}
-	if a.Logger == nil {
+	if p.Logger == nil {
 		return fmt.Errorf("during Args validation: logger cannot be nil")
 	}
-	if a.Builder == nil {
+	if p.Builder == nil {
 		return fmt.Errorf("during Args validation: builder cannot be nil")
 	}
 

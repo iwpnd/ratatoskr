@@ -5,20 +5,20 @@ import (
 	"time"
 )
 
-func configState(ctx context.Context, args Args) (Args, State[Args], error) {
-	args.Logger.Info("starting config state", "name", args.Name)
+func configState(ctx context.Context, params Params) (Params, State[Params], error) {
+	params.Logger.Info("starting config state", "name", params.Name)
 	start := time.Now()
 
-	err := args.Builder.BuildConfig(ctx)
+	err := params.Builder.BuildConfig(ctx)
 	if err != nil {
-		return args, nil, &StateError{State: ConfigState, Err: err}
+		return params, nil, &StateError{State: ConfigState, Err: err}
 	}
 
 	elapsed := time.Since(start)
-	args.Logger.Info(
+	params.Logger.Info(
 		"successfully finished config state",
-		"name", args.Name,
+		"name", params.Name,
 		"elapsed", elapsed.String(),
 	)
-	return args, buildState, nil
+	return params, buildState, nil
 }

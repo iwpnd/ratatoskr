@@ -47,13 +47,13 @@ func TestDownloadState(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		args      Args
+		params    Params
 		expectErr bool
-		wantState State[Args]
+		wantState State[Params]
 	}{
 		{
 			name: "Downloader returns an Error",
-			args: Args{
+			params: Params{
 				Logger: logger,
 				Downloader: &TestDownloader{
 					get: fmt.Errorf("error during download"),
@@ -63,7 +63,7 @@ func TestDownloadState(t *testing.T) {
 		},
 		{
 			name: "downloadState returns an configState",
-			args: Args{
+			params: Params{
 				Logger: logger,
 				Downloader: &TestDownloader{
 					get: nil,
@@ -74,7 +74,7 @@ func TestDownloadState(t *testing.T) {
 		},
 		{
 			name: "No Downloader defined",
-			args: Args{
+			params: Params{
 				Logger: logger,
 			},
 			expectErr: false,
@@ -83,7 +83,7 @@ func TestDownloadState(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		_, nextState, err := downloadState(ctx, test.args)
+		_, nextState, err := downloadState(ctx, test.params)
 		switch {
 		case err == nil && test.expectErr:
 			t.Errorf("TestDownloadState - %s: got err == nil, want err != nil", test.name)

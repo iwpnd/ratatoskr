@@ -5,20 +5,20 @@ import (
 	"time"
 )
 
-func adminState(ctx context.Context, args Args) (Args, State[Args], error) {
-	args.Logger.Info("starting admins state", "name", args.Name)
+func adminState(ctx context.Context, params Params) (Params, State[Params], error) {
+	params.Logger.Info("starting admins state", "name", params.Name)
 	start := time.Now()
 
-	err := args.Builder.BuildAdmins(ctx)
+	err := params.Builder.BuildAdmins(ctx)
 	if err != nil {
-		return args, nil, &StateError{State: AdminState, Err: err}
+		return params, nil, &StateError{State: AdminState, Err: err}
 	}
 
 	elapsed := time.Since(start)
-	args.Logger.Info(
+	params.Logger.Info(
 		"successfully finished admins state",
-		"name", args.Name,
+		"name", params.Name,
 		"elapsed", elapsed.String(),
 	)
-	return args, extractState, nil
+	return params, extractState, nil
 }

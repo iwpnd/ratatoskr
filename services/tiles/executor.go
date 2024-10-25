@@ -20,8 +20,8 @@ type executor struct {
 	debug  bool
 }
 
-func (e *executor) execute(ctx context.Context, command string, args []string) error {
-	cmd := exec.CommandContext(ctx, command, args...)
+func (e *executor) execute(ctx context.Context, command string, params []string) error {
+	cmd := exec.CommandContext(ctx, command, params...)
 	if e.debug {
 		cmd.Stderr = &customOutput{logger: e.logger}
 		cmd.Stdout = &customOutput{logger: e.logger}
@@ -38,9 +38,9 @@ func (e *executor) execute(ctx context.Context, command string, args []string) e
 func (e *executor) executeWithOutput(
 	ctx context.Context,
 	command string,
-	args []string,
+	params []string,
 ) ([]byte, error) {
-	cmd := exec.CommandContext(ctx, command, args...)
+	cmd := exec.CommandContext(ctx, command, params...)
 
 	output, err := cmd.Output()
 	if err != nil {

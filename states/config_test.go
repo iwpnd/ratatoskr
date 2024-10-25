@@ -38,13 +38,13 @@ func TestConfigState(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		args      Args
+		params    Params
 		expectErr bool
-		wantState State[Args]
+		wantState State[Params]
 	}{
 		{
 			name: "TileBuilder.BuildConfig returns an Error",
-			args: Args{
+			params: Params{
 				Logger: logger,
 				Builder: &TestTileBuilder{
 					buildconfig: fmt.Errorf("error during config creation"),
@@ -54,7 +54,7 @@ func TestConfigState(t *testing.T) {
 		},
 		{
 			name: "configState returns buildState",
-			args: Args{
+			params: Params{
 				Logger:  logger,
 				Builder: &TestTileBuilder{},
 			},
@@ -64,7 +64,7 @@ func TestConfigState(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		_, nextState, err := configState(ctx, test.args)
+		_, nextState, err := configState(ctx, test.params)
 		switch {
 		case err == nil && test.expectErr:
 			t.Errorf("TestConfigState - %s: got err == nil, want err != nil", test.name)

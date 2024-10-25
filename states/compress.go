@@ -5,33 +5,33 @@ import (
 	"time"
 )
 
-func compressState(ctx context.Context, args Args) (Args, State[Args], error) {
-	if args.Compressor == nil {
-		return args, nil, nil
+func compressState(ctx context.Context, params Params) (Params, State[Params], error) {
+	if params.Compressor == nil {
+		return params, nil, nil
 	}
 
-	args.Logger.Info("starting compression state", "name", args.Name)
+	params.Logger.Info("starting compression state", "name", params.Name)
 	start := time.Now()
 
-	archive := args.Builder.GetPath() + "/valhalla_tiles"
-	err := args.Compressor.Compress(
+	archive := params.Builder.GetPath() + "/valhalla_tiles"
+	err := params.Compressor.Compress(
 		ctx,
 		archive,
-		args.Builder.GetExtractPath(),
-		args.Builder.GetAdminPath(),
+		params.Builder.GetExtractPath(),
+		params.Builder.GetAdminPath(),
 	)
 
 	if err != nil {
-		return args, nil, &StateError{State: CompressState, Err: err}
+		return params, nil, &StateError{State: CompressState, Err: err}
 	}
 
 	elapsed := time.Since(start)
-	args.Logger.Info(
+	params.Logger.Info(
 		"successfully finished compression state",
 		"name",
-		args.Name,
+		params.Name,
 		"archive", archive,
 		"elapsed", elapsed.String(),
 	)
-	return args, nil, nil
+	return params, nil, nil
 }
