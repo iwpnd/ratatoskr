@@ -11,13 +11,13 @@ import (
 )
 
 type GeofabrikDownloaderOptions struct {
-	Url        string
 	Dataset    string
 	OutputPath string
 }
 
 type GeofabrikDownloader struct {
-	opts GeofabrikDownloaderOptions
+	baseUrl string
+	opts    GeofabrikDownloaderOptions
 }
 
 func FileExists(filepath string) bool {
@@ -28,11 +28,11 @@ func FileExists(filepath string) bool {
 func NewGeofabrikDownloader(
 	opts GeofabrikDownloaderOptions,
 ) *GeofabrikDownloader {
-	return &GeofabrikDownloader{opts: opts}
+	return &GeofabrikDownloader{opts: opts, baseUrl: "http://download.geofabrik.de"}
 }
 
 func (od *GeofabrikDownloader) Get(ctx context.Context) error {
-	g, err := geofabrik.New(od.opts.Url)
+	g, err := geofabrik.New(od.baseUrl)
 	if err != nil {
 		return fmt.Errorf("cannot instantiate geofabrik: %w", err)
 	}
@@ -50,7 +50,7 @@ func (od *GeofabrikDownloader) Get(ctx context.Context) error {
 }
 
 func (od *GeofabrikDownloader) MD5(ctx context.Context) (string, error) {
-	g, err := geofabrik.New(od.opts.Url)
+	g, err := geofabrik.New(od.baseUrl)
 	if err != nil {
 		return "", fmt.Errorf("cannot instantiate geofabrik: %w", err)
 	}
