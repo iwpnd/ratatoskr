@@ -48,3 +48,22 @@ func (od *GeofabrikDownloader) Get(ctx context.Context) error {
 
 	return nil
 }
+
+func (od *GeofabrikDownloader) MD5(ctx context.Context) (string, error) {
+	g, err := geofabrik.New(od.opts.Url)
+	if err != nil {
+		return "", fmt.Errorf("cannot instantiate geofabrik: %w", err)
+	}
+
+	md5, err := g.MD5(ctx, od.opts.Dataset)
+	if err != nil {
+		return "", fmt.Errorf("failed fetch MD5 from geofabrik dataset %s: %w", od.opts.Dataset, err)
+	}
+
+	if ctx.Err() != nil {
+		return "", ctx.Err()
+	}
+
+	return md5, nil
+
+}
