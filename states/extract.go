@@ -11,7 +11,7 @@ func extractState(ctx context.Context, args Args) (Args, State[Args], error) {
 
 	err := args.Builder.BuildTilesExtract(ctx)
 	if err != nil {
-		return args, nil, err
+		return args, nil, &StateError{State: ExtractState, Err: err}
 	}
 
 	elapsed := time.Since(start)

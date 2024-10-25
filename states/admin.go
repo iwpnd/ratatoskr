@@ -11,7 +11,7 @@ func adminState(ctx context.Context, args Args) (Args, State[Args], error) {
 
 	err := args.Builder.BuildAdmins(ctx)
 	if err != nil {
-		return args, nil, err
+		return args, nil, &StateError{State: AdminState, Err: err}
 	}
 
 	elapsed := time.Since(start)

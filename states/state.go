@@ -4,6 +4,36 @@ import (
 	"context"
 )
 
+type States int
+
+const (
+	AdminState States = iota
+	BuildState
+	CompressState
+	ConfigState
+	DownloadState
+	ExtractState
+)
+
+func (s States) String() string {
+	switch s {
+	case AdminState:
+		return "AdminState"
+	case BuildState:
+		return "BuildState"
+	case CompressState:
+		return "CompressState"
+	case ConfigState:
+		return "ConfigState"
+	case DownloadState:
+		return "DownloadState"
+	case ExtractState:
+		return "ExtractState"
+	default:
+		return "Unknown"
+	}
+}
+
 func Execute(ctx context.Context, args Args) error {
 	if err := args.validate(ctx); err != nil {
 		return err

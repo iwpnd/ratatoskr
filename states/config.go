@@ -11,7 +11,7 @@ func configState(ctx context.Context, args Args) (Args, State[Args], error) {
 
 	err := args.Builder.BuildConfig(ctx)
 	if err != nil {
-		return args, nil, err
+		return args, nil, &StateError{State: ConfigState, Err: err}
 	}
 
 	elapsed := time.Since(start)

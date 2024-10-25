@@ -22,7 +22,7 @@ func compressState(ctx context.Context, args Args) (Args, State[Args], error) {
 	)
 
 	if err != nil {
-		return args, nil, err
+		return args, nil, &StateError{State: CompressState, Err: err}
 	}
 
 	elapsed := time.Since(start)

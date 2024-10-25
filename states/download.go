@@ -16,8 +16,7 @@ func downloadState(ctx context.Context, args Args) (Args, State[Args], error) {
 
 	err := args.Downloader.Get(ctx)
 	if err != nil {
-		args.Logger.Error("Failed download state", "name", args.Name, "error", err)
-		return args, nil, err
+		return args, nil, &StateError{State: DownloadState, Err: err}
 	}
 
 	elapsed := time.Since(start)

@@ -11,7 +11,7 @@ func buildState(ctx context.Context, args Args) (Args, State[Args], error) {
 
 	err := args.Builder.BuildTiles(ctx)
 	if err != nil {
-		return args, nil, err
+		return args, nil, &StateError{State: BuildState, Err: err}
 	}
 
 	elapsed := time.Since(start)
