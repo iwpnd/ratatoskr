@@ -6,10 +6,6 @@ import (
 	"log/slog"
 )
 
-type FileStorer interface {
-	Get(ctx context.Context, id string) error
-}
-
 type FileStore struct {
 	name   string
 	logger *slog.Logger

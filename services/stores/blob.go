@@ -6,10 +6,6 @@ import (
 	"log/slog"
 )
 
-type BlobStorer interface {
-	Get(ctx context.Context, id string) error
-}
-
 type BlobStore struct {
 	name   string
 	logger *slog.Logger
