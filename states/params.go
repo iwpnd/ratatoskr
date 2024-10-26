@@ -11,26 +11,50 @@ import (
 )
 
 type Params struct {
-	Name string
+	name   string
+	logger *slog.Logger
 
-	Downloader download.Downloader
-	Builder    tiles.Builder
-	Compressor compress.Compressor
-
-	Logger *slog.Logger
+	downloader download.Downloader
+	builder    tiles.Builder
+	compressor compress.Compressor
 }
 
-func (p Params) Validate(ctx context.Context) error {
+func NewParams(name string, logger *slog.Logger) *Params {
+	return &Params{
+		name:   name,
+		logger: logger,
+	}
+}
+
+func (p *Params) Validate(ctx context.Context) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
 
-	if p.Name == "" {
+	if p.name == "" {
 		return fmt.Errorf("during Params validation: name cannot be empty string")
 	}
-	if p.Logger == nil {
+	if p.logger == nil {
 		return fmt.Errorf("during Params validation: logger cannot be nil")
+	}
+	if p.compressor != nil && p.builder == nil {
+		return fmt.Errorf("cannot use compressor without tiles builder")
 	}
 
 	return nil
+}
+
+func (p *Params) WithDownload(downloader download.Downloader) *Params {
+	p.downloader = downloader
+	return p
+}
+
+func (p *Params) WithTileBuilder(builder tiles.Builder) *Params {
+	p.builder = builder
+	return p
+}
+
+func (p *Params) WithCompression(compressor compress.Compressor) *Params {
+	p.compressor = compressor
+	return p
 }

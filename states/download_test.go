@@ -47,36 +47,30 @@ func TestDownloadState(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		params    Params
+		params    *Params
 		expectErr bool
 		wantState State[Params]
 	}{
 		{
 			name: "Downloader returns an Error",
-			params: Params{
-				Logger: logger,
-				Downloader: &TestDownloader{
-					get: fmt.Errorf("error during download"),
-				},
-			},
+			params: NewParams("test", logger).
+				WithDownload(
+					&TestDownloader{get: fmt.Errorf("error during download")},
+				),
 			expectErr: true,
 		},
 		{
 			name: "downloadState returns an configState",
-			params: Params{
-				Logger: logger,
-				Downloader: &TestDownloader{
-					get: nil,
-				},
-			},
+			params: NewParams("test", logger).
+				WithDownload(
+					&TestDownloader{get: nil},
+				),
 			expectErr: false,
 			wantState: ConfigState,
 		},
 		{
-			name: "No Downloader defined",
-			params: Params{
-				Logger: logger,
-			},
+			name:      "No Downloader defined",
+			params:    NewParams("test", logger),
 			expectErr: false,
 			wantState: ConfigState,
 		},

@@ -38,26 +38,24 @@ func TestConfigState(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		params    Params
+		params    *Params
 		expectErr bool
 		wantState State[Params]
 	}{
 		{
 			name: "TileBuilder.BuildConfig returns an Error",
-			params: Params{
-				Logger: logger,
-				Builder: &TestTileBuilder{
-					buildconfig: fmt.Errorf("error during config creation"),
-				},
-			},
+			params: NewParams("test", logger).
+				WithTileBuilder(
+					&TestTileBuilder{buildconfig: fmt.Errorf("error during config creation")},
+				),
 			expectErr: true,
 		},
 		{
 			name: "configState returns buildState",
-			params: Params{
-				Logger:  logger,
-				Builder: &TestTileBuilder{},
-			},
+			params: NewParams("test", logger).
+				WithTileBuilder(
+					&TestTileBuilder{},
+				),
 			expectErr: false,
 			wantState: BuildState,
 		},

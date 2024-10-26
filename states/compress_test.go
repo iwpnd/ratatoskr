@@ -46,36 +46,30 @@ func TestCompressState(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		params    Params
+		params    *Params
 		expectErr bool
 		wantState State[Params]
 	}{
 		{
 			name: "Compressor returns an Error",
-			params: Params{
-				Logger:  logger,
-				Builder: &TestTileBuilder{path: "testpath"},
-				Compressor: &TestCompressor{
+			params: NewParams("test", logger).
+				WithTileBuilder(&TestTileBuilder{path: "testpath"}).
+				WithCompression(&TestCompressor{
 					compress: fmt.Errorf("error during compression"),
-				},
-			},
+				}),
 			expectErr: true,
 		},
 		{
 			name: "compressState returns nil",
-			params: Params{
-				Logger:     logger,
-				Builder:    &TestTileBuilder{path: "testpath"},
-				Compressor: &TestCompressor{},
-			},
+			params: NewParams("test", logger).
+				WithTileBuilder(&TestTileBuilder{path: "testpath"}).
+				WithCompression(&TestCompressor{}),
 			expectErr: false,
 			wantState: nil,
 		},
 		{
-			name: "No Compressor defined",
-			params: Params{
-				Logger: logger,
-			},
+			name:      "No Compressor defined",
+			params:    NewParams("test", logger),
 			expectErr: false,
 			wantState: nil,
 		},

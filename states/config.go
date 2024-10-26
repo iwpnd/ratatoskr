@@ -5,23 +5,23 @@ import (
 	"time"
 )
 
-func ConfigState(ctx context.Context, params Params) (Params, State[Params], error) {
-	if params.Builder == nil {
+func ConfigState(ctx context.Context, params *Params) (*Params, State[Params], error) {
+	if params.builder == nil {
 		return params, nil, nil
 	}
 
-	params.Logger.Info("starting config state", "name", params.Name)
+	params.logger.Info("starting config state", "name", params.name)
 	start := time.Now()
 
-	err := params.Builder.BuildConfig(ctx)
+	err := params.builder.BuildConfig(ctx)
 	if err != nil {
 		return params, nil, &StateError{State: configState, Err: err}
 	}
 
 	elapsed := time.Since(start)
-	params.Logger.Info(
+	params.logger.Info(
 		"successfully finished config state",
-		"name", params.Name,
+		"name", params.name,
 		"elapsed", elapsed.String(),
 	)
 	return params, BuildState, nil

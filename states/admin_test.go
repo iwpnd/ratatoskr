@@ -25,26 +25,24 @@ func TestAdminState(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		params    Params
+		params    *Params
 		expectErr bool
 		wantState State[Params]
 	}{
 		{
 			name: "TileBuilder.BuildAdmins returns an Error",
-			params: Params{
-				Logger: logger,
-				Builder: &TestTileBuilder{
-					buildadmins: fmt.Errorf("error during building admins"),
-				},
-			},
+			params: NewParams("test", logger).
+				WithTileBuilder(
+					&TestTileBuilder{buildadmins: fmt.Errorf("error during building admins")},
+				),
 			expectErr: true,
 		},
 		{
 			name: "adminState returns extractState",
-			params: Params{
-				Logger:  logger,
-				Builder: &TestTileBuilder{},
-			},
+			params: NewParams("test", logger).
+				WithTileBuilder(
+					&TestTileBuilder{},
+				),
 			expectErr: false,
 			wantState: ExtractState,
 		},

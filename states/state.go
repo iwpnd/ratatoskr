@@ -34,4 +34,4 @@ func (s States) String() string {
 	}
 }
 
-type State[T any] func(ctx context.Context, params T) (T, State[T], error)
+type State[T any] func(ctx context.Context, params *T) (*T, State[T], error)

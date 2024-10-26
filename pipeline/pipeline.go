@@ -6,7 +6,7 @@ import (
 	"github.com/iwpnd/valhalla-tiles-builder/states"
 )
 
-func Execute(ctx context.Context, params states.Params) error {
+func Execute(ctx context.Context, params *states.Params) error {
 	if err := params.Validate(ctx); err != nil {
 		return err
 	}
@@ -19,7 +19,7 @@ func Execute(ctx context.Context, params states.Params) error {
 	return nil
 }
 
-func run[T any](ctx context.Context, params T, start states.State[T]) (T, error) {
+func run[T any](ctx context.Context, params *T, start states.State[T]) (*T, error) {
 	var err error
 	current := start
 	for {
