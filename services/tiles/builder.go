@@ -13,13 +13,10 @@ type Builder interface {
 	BuildTiles(context.Context) error
 	BuildTilesExtract(context.Context) error
 	BuildAdmins(context.Context) error
-	GetPath() string
-	GetAdminPath() string
-	GetExtractPath() string
-	GetTilePath() string
-	GetConfigPath() string
-	GetMaxCacheSize() int64
-	GetConcurrency() int
+	Path() string
+	AdminPath() string
+	ExtractPath() string
+	TilesPath() string
 }
 
 type TileBuilder struct {
@@ -59,6 +56,15 @@ func createPathIfNotExists(path string) error {
 	return nil
 }
 
+func requiredBinaries() []string {
+	return []string{
+		"valhalla_build_admins",
+		"valhalla_build_config",
+		"valhalla_build_extract",
+		"valhalla_build_tiles",
+	}
+}
+
 func NewTileBuilder(
 	opts *TileBuilderOptions,
 	logger *slog.Logger) (*TileBuilder, error) {
@@ -74,78 +80,33 @@ func NewTileBuilder(
 		logger: logger,
 		debug:  opts.Debug,
 	}
-	if !executor.hasExecutable("valhalla_build_tiles") {
-		return nil, fmt.Errorf("missing executable: valhalla_build_tiles")
-	}
 
-	if !executor.hasExecutable("valhalla_build_extract") {
-		return nil, fmt.Errorf("missing executable: valhalla_build_extract")
-	}
-
-	if !executor.hasExecutable("valhalla_build_admins") {
-		return nil, fmt.Errorf("missing executable: valhalla_build_admins")
-	}
-
-	if !executor.hasExecutable("valhalla_build_config") {
-		return nil, fmt.Errorf("missing executable: valhalla_build_config")
+	for _, b := range requiredBinaries() {
+		if !executor.hasExecutable(b) {
+			return nil, fmt.Errorf("missing executable: %s", b)
+		}
 	}
 
 	builder := &TileBuilder{executor: executor, logger: logger}
+	builder.concurrency = opts.Concurrency
+	builder.maxCacheSize = opts.MaxCacheSize
+
 	err := createPathIfNotExists(opts.Path)
 	if err != nil {
 		return nil, fmt.Errorf("error creating basepath: %d", err)
 	}
 	builder.path = opts.Path
-
-	tilesPath := opts.Path + "/valhalla_tiles"
-	err = createPathIfNotExists(opts.Path + "/valhalla_tiles")
+	builder.tilesPath = builder.path + "/valhalla_tiles"
+	err = createPathIfNotExists(builder.tilesPath)
 	if err != nil {
 		return nil, fmt.Errorf("error creating valhalla_tiles path: %s", err)
 	}
-	builder.tilesPath = tilesPath
-
 	builder.extractPath = builder.path + "/valhalla_tiles.tar"
 	builder.adminPath = builder.path + "/admin.sqlite"
-	builder.configPath = builder.path + "/valhalla.json"
-
+	builder.configPath = builder.path + "/config.json"
 	builder.datasetPath = builder.path + "/" + opts.Dataset
 
-	builder.concurrency = opts.Concurrency
-	builder.maxCacheSize = opts.MaxCacheSize
-
 	return builder, nil
-}
-
-func (ve *TileBuilder) GetPath() string {
-	return ve.path
-}
-
-func (ve *TileBuilder) GetConfigPath() string {
-	return ve.configPath
-}
-
-func (ve *TileBuilder) GetTilePath() string {
-	return ve.tilesPath
-}
-
-func (ve *TileBuilder) GetExtractPath() string {
-	return ve.extractPath
-}
-
-func (ve *TileBuilder) GetAdminPath() string {
-	return ve.adminPath
-}
-
-func (ve *TileBuilder) GetDatasetPath() string {
-	return ve.adminPath
-}
-
-func (ve *TileBuilder) GetConcurrency() int {
-	return ve.concurrency
-}
-
-func (ve *TileBuilder) GetMaxCacheSize() int64 {
-	return ve.maxCacheSize
 }
 
 func (ve *TileBuilder) BuildConfig(ctx context.Context) error {
@@ -248,4 +209,20 @@ func (ve *TileBuilder) BuildAdmins(ctx context.Context) error {
 	)
 
 	return nil
+}
+
+func (ve *TileBuilder) Path() string {
+	return ve.path
+}
+
+func (ve *TileBuilder) ExtractPath() string {
+	return ve.extractPath
+}
+
+func (ve *TileBuilder) AdminPath() string {
+	return ve.adminPath
+}
+
+func (ve *TileBuilder) TilesPath() string {
+	return ve.tilesPath
 }

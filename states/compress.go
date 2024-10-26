@@ -13,12 +13,12 @@ func compressState(ctx context.Context, params Params) (Params, State[Params], e
 	params.Logger.Info("starting compression state", "name", params.Name)
 	start := time.Now()
 
-	archive := params.Builder.GetPath() + "/valhalla_tiles"
+	archive := params.Builder.Path() + "/valhalla_tiles"
 	err := params.Compressor.Compress(
 		ctx,
-		archive,
-		params.Builder.GetExtractPath(),
-		params.Builder.GetAdminPath(),
+		params.Builder.TilesPath(),
+		params.Builder.ExtractPath(),
+		params.Builder.AdminPath(),
 	)
 
 	if err != nil {

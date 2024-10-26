@@ -24,15 +24,19 @@ func (c *TestCompressor) Compress(ctx context.Context, archive string, files ...
 
 }
 
-func (tb *TestTileBuilder) GetPath() string {
+func (tb *TestTileBuilder) Path() string {
 	return tb.path
 }
 
-func (tb *TestTileBuilder) GetExtractPath() string {
+func (tb *TestTileBuilder) ExtractPath() string {
 	return tb.path
 }
 
-func (tb *TestTileBuilder) GetAdminPath() string {
+func (tb *TestTileBuilder) AdminPath() string {
+	return tb.path
+}
+
+func (tb *TestTileBuilder) TilesPath() string {
 	return tb.path
 }
 
