@@ -82,7 +82,7 @@ func TestCompressState(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		_, nextState, err := compressState(ctx, test.params)
+		_, nextState, err := CompressState(ctx, test.params)
 		switch {
 		case err == nil && test.expectErr:
 			t.Errorf("TestCompressState - %s: got err == nil, want err != nil", test.name)

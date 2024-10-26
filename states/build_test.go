@@ -46,12 +46,12 @@ func TestBuildState(t *testing.T) {
 				Builder: &TestTileBuilder{},
 			},
 			expectErr: false,
-			wantState: adminState,
+			wantState: AdminState,
 		},
 	}
 
 	for _, test := range tests {
-		_, nextState, err := buildState(ctx, test.params)
+		_, nextState, err := BuildState(ctx, test.params)
 		switch {
 		case err == nil && test.expectErr:
 			t.Errorf("TestBuildState - %s: got err == nil, want err != nil", test.name)

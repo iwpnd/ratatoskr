@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/iwpnd/valhalla-builder/services/download"
+	"github.com/iwpnd/valhalla-tiles-builder/services/download"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -70,7 +70,7 @@ func TestDownloadState(t *testing.T) {
 				},
 			},
 			expectErr: false,
-			wantState: configState,
+			wantState: ConfigState,
 		},
 		{
 			name: "No Downloader defined",
@@ -78,12 +78,12 @@ func TestDownloadState(t *testing.T) {
 				Logger: logger,
 			},
 			expectErr: false,
-			wantState: configState,
+			wantState: ConfigState,
 		},
 	}
 
 	for _, test := range tests {
-		_, nextState, err := downloadState(ctx, test.params)
+		_, nextState, err := DownloadState(ctx, test.params)
 		switch {
 		case err == nil && test.expectErr:
 			t.Errorf("TestDownloadState - %s: got err == nil, want err != nil", test.name)

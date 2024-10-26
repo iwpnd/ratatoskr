@@ -7,27 +7,27 @@ import (
 type States int
 
 const (
-	AdminState States = iota
-	BuildState
-	CompressState
-	ConfigState
-	DownloadState
-	ExtractState
+	adminState States = iota
+	buildState
+	compressState
+	configState
+	downloadState
+	extractState
 )
 
 func (s States) String() string {
 	switch s {
-	case AdminState:
+	case adminState:
 		return "AdminState"
-	case BuildState:
+	case buildState:
 		return "BuildState"
-	case CompressState:
+	case compressState:
 		return "CompressState"
-	case ConfigState:
+	case configState:
 		return "ConfigState"
-	case DownloadState:
+	case downloadState:
 		return "DownloadState"
-	case ExtractState:
+	case extractState:
 		return "ExtractState"
 	default:
 		return "Unknown"
@@ -35,33 +35,3 @@ func (s States) String() string {
 }
 
 type State[T any] func(ctx context.Context, params T) (T, State[T], error)
-
-func Execute(ctx context.Context, params Params) error {
-	if err := params.validate(ctx); err != nil {
-		return err
-	}
-
-	start := downloadState
-	_, err := run(ctx, params, start)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func run[T any](ctx context.Context, params T, start State[T]) (T, error) {
-	var err error
-	current := start
-	for {
-		if ctx.Err() != nil {
-			return params, ctx.Err()
-		}
-		params, current, err = current(ctx, params)
-		if err != nil {
-			return params, err
-		}
-		if current == nil {
-			return params, nil
-		}
-	}
-}

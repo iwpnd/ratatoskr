@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/iwpnd/valhalla-builder/services/tiles"
+	"github.com/iwpnd/valhalla-tiles-builder/services/tiles"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -59,12 +59,12 @@ func TestConfigState(t *testing.T) {
 				Builder: &TestTileBuilder{},
 			},
 			expectErr: false,
-			wantState: buildState,
+			wantState: BuildState,
 		},
 	}
 
 	for _, test := range tests {
-		_, nextState, err := configState(ctx, test.params)
+		_, nextState, err := ConfigState(ctx, test.params)
 		switch {
 		case err == nil && test.expectErr:
 			t.Errorf("TestConfigState - %s: got err == nil, want err != nil", test.name)

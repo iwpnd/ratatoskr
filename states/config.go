@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func configState(ctx context.Context, params Params) (Params, State[Params], error) {
+func ConfigState(ctx context.Context, params Params) (Params, State[Params], error) {
 	if params.Builder == nil {
 		return params, nil, nil
 	}
@@ -15,7 +15,7 @@ func configState(ctx context.Context, params Params) (Params, State[Params], err
 
 	err := params.Builder.BuildConfig(ctx)
 	if err != nil {
-		return params, nil, &StateError{State: ConfigState, Err: err}
+		return params, nil, &StateError{State: configState, Err: err}
 	}
 
 	elapsed := time.Since(start)
@@ -24,5 +24,5 @@ func configState(ctx context.Context, params Params) (Params, State[Params], err
 		"name", params.Name,
 		"elapsed", elapsed.String(),
 	)
-	return params, buildState, nil
+	return params, BuildState, nil
 }

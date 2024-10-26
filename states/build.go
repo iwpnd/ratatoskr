@@ -5,13 +5,13 @@ import (
 	"time"
 )
 
-func buildState(ctx context.Context, params Params) (Params, State[Params], error) {
+func BuildState(ctx context.Context, params Params) (Params, State[Params], error) {
 	params.Logger.Info("starting build state", "name", params.Name)
 	start := time.Now()
 
 	err := params.Builder.BuildTiles(ctx)
 	if err != nil {
-		return params, nil, &StateError{State: BuildState, Err: err}
+		return params, nil, &StateError{State: buildState, Err: err}
 	}
 
 	elapsed := time.Since(start)
@@ -20,5 +20,5 @@ func buildState(ctx context.Context, params Params) (Params, State[Params], erro
 		"name", params.Name,
 		"elapsed", elapsed.String(),
 	)
-	return params, adminState, nil
+	return params, AdminState, nil
 }

@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func compressState(ctx context.Context, params Params) (Params, State[Params], error) {
+func CompressState(ctx context.Context, params Params) (Params, State[Params], error) {
 	if params.Compressor == nil {
 		return params, nil, nil
 	}
@@ -22,7 +22,7 @@ func compressState(ctx context.Context, params Params) (Params, State[Params], e
 	)
 
 	if err != nil {
-		return params, nil, &StateError{State: CompressState, Err: err}
+		return params, nil, &StateError{State: compressState, Err: err}
 	}
 
 	elapsed := time.Since(start)

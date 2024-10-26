@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/iwpnd/valhalla-builder/services/compress"
-	"github.com/iwpnd/valhalla-builder/services/download"
-	"github.com/iwpnd/valhalla-builder/services/tiles"
+	"github.com/iwpnd/valhalla-tiles-builder/services/compress"
+	"github.com/iwpnd/valhalla-tiles-builder/services/download"
+	"github.com/iwpnd/valhalla-tiles-builder/services/tiles"
 )
 
 type Params struct {
@@ -20,7 +20,7 @@ type Params struct {
 	Logger *slog.Logger
 }
 
-func (p Params) validate(ctx context.Context) error {
+func (p Params) Validate(ctx context.Context) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}

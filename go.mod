@@ -1,4 +1,4 @@
-module github.com/iwpnd/valhalla-builder
+module github.com/iwpnd/valhalla-tiles-builder
 
 go 1.22.3
 

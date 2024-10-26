@@ -46,12 +46,12 @@ func TestExtractState(t *testing.T) {
 				Builder: &TestTileBuilder{},
 			},
 			expectErr: false,
-			wantState: compressState,
+			wantState: CompressState,
 		},
 	}
 
 	for _, test := range tests {
-		_, nextState, err := extractState(ctx, test.params)
+		_, nextState, err := ExtractState(ctx, test.params)
 		switch {
 		case err == nil && test.expectErr:
 			t.Errorf("TestExtractState - %s: got err == nil, want err != nil", test.name)

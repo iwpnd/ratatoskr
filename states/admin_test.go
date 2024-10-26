@@ -46,12 +46,12 @@ func TestAdminState(t *testing.T) {
 				Builder: &TestTileBuilder{},
 			},
 			expectErr: false,
-			wantState: extractState,
+			wantState: ExtractState,
 		},
 	}
 
 	for _, test := range tests {
-		_, nextState, err := adminState(ctx, test.params)
+		_, nextState, err := AdminState(ctx, test.params)
 		switch {
 		case err == nil && test.expectErr:
 			t.Errorf("TestAdminState - %s: got err == nil, want err != nil", test.name)
