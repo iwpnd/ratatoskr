@@ -68,13 +68,6 @@ func requiredBinaries() []string {
 func NewTileBuilder(
 	opts *TileBuilderOptions,
 	logger *slog.Logger) (*TileBuilder, error) {
-	if opts.Path == "" {
-		return nil, fmt.Errorf("missing path input")
-	}
-
-	if opts.Dataset == "" {
-		return nil, fmt.Errorf("missing dataset input")
-	}
 
 	executor := &executor{
 		logger: logger,
@@ -88,23 +81,37 @@ func NewTileBuilder(
 	}
 
 	builder := &TileBuilder{executor: executor, logger: logger}
-	builder.concurrency = opts.Concurrency
-	builder.maxCacheSize = opts.MaxCacheSize
+	builder.concurrency = 2
+	if opts.Concurrency != 0 {
+		builder.concurrency = opts.Concurrency
+	}
 
-	err := createPathIfNotExists(opts.Path)
-	if err != nil {
-		return nil, fmt.Errorf("error creating basepath: %d", err)
+	builder.maxCacheSize = 700 * 1048576 // 700MiB
+	if opts.MaxCacheSize != 0 {
+		builder.maxCacheSize = opts.MaxCacheSize
 	}
-	builder.path = opts.Path
-	builder.tilesPath = builder.path + "/valhalla_tiles"
-	err = createPathIfNotExists(builder.tilesPath)
-	if err != nil {
-		return nil, fmt.Errorf("error creating valhalla_tiles path: %s", err)
+
+	if opts.Path != "" {
+		if opts.Dataset == "" {
+			return nil, fmt.Errorf("set path but missing dataset name")
+		}
+
+		err := createPathIfNotExists(opts.Path)
+		if err != nil {
+			return nil, fmt.Errorf("error creating basepath: %d", err)
+		}
+		builder.path = opts.Path
+		builder.tilesPath = builder.path + "/valhalla_tiles"
+		err = createPathIfNotExists(builder.tilesPath)
+		if err != nil {
+			return nil, fmt.Errorf("error creating valhalla_tiles path: %s", err)
+		}
+		builder.extractPath = builder.path + "/valhalla_tiles.tar"
+		builder.adminPath = builder.path + "/admin.sqlite"
+		builder.configPath = builder.path + "/config.json"
+		builder.datasetPath = builder.path + "/" + opts.Dataset
+		return builder, nil
 	}
-	builder.extractPath = builder.path + "/valhalla_tiles.tar"
-	builder.adminPath = builder.path + "/admin.sqlite"
-	builder.configPath = builder.path + "/config.json"
-	builder.datasetPath = builder.path + "/" + opts.Dataset
 
 	return builder, nil
 }
