@@ -6,6 +6,10 @@ import (
 )
 
 func configState(ctx context.Context, params Params) (Params, State[Params], error) {
+	if params.Builder == nil {
+		return params, nil, nil
+	}
+
 	params.Logger.Info("starting config state", "name", params.Name)
 	start := time.Now()
 

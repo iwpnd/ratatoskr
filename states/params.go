@@ -26,13 +26,10 @@ func (p Params) validate(ctx context.Context) error {
 	}
 
 	if p.Name == "" {
-		return fmt.Errorf("during Args validation: name cannot be empty string")
+		return fmt.Errorf("during Params validation: name cannot be empty string")
 	}
 	if p.Logger == nil {
-		return fmt.Errorf("during Args validation: logger cannot be nil")
-	}
-	if p.Builder == nil {
-		return fmt.Errorf("during Args validation: builder cannot be nil")
+		return fmt.Errorf("during Params validation: logger cannot be nil")
 	}
 
 	return nil
