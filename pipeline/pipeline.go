@@ -3,7 +3,7 @@ package pipeline
 import (
 	"context"
 
-	"github.com/iwpnd/valhalla-tiles-builder/states"
+	"github.com/iwpnd/ratatoskr/states"
 )
 
 func Execute(ctx context.Context, params *states.Params) error {

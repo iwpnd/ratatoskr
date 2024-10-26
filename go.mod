@@ -1,4 +1,4 @@
-module github.com/iwpnd/valhalla-tiles-builder
+module github.com/iwpnd/ratatoskr
 
 go 1.22.3
 

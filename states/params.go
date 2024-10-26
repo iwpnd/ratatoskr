@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/iwpnd/valhalla-tiles-builder/services/compress"
-	"github.com/iwpnd/valhalla-tiles-builder/services/download"
-	"github.com/iwpnd/valhalla-tiles-builder/services/tiles"
+	"github.com/iwpnd/ratatoskr/services/compress"
+	"github.com/iwpnd/ratatoskr/services/download"
+	"github.com/iwpnd/ratatoskr/services/tiles"
 )
 
 type Params struct {

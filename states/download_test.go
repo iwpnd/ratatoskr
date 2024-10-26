@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/iwpnd/valhalla-tiles-builder/services/download"
+	"github.com/iwpnd/ratatoskr/services/download"
 
 	"github.com/stretchr/testify/assert"
 )

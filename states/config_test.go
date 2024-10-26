@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/iwpnd/valhalla-tiles-builder/services/tiles"
+	"github.com/iwpnd/ratatoskr/services/tiles"
 
 	"github.com/stretchr/testify/assert"
 )
