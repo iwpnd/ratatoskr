@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 )
 
+// Builder ...
 type Builder interface {
 	BuildConfig(ctx context.Context, dataset string, outputPath string) error
 	BuildTiles(ctx context.Context, dataset string, outputPath string) error
@@ -20,6 +22,7 @@ type Builder interface {
 	TilesPath() (string, bool)
 }
 
+// TileBuilder ...
 type TileBuilder struct {
 	concurrency  int
 	maxCacheSize int64
@@ -37,6 +40,7 @@ type TileBuilder struct {
 	executor *executor
 }
 
+// TileBuilderOptions ...
 type TileBuilderOptions struct {
 	Debug bool
 
@@ -44,28 +48,30 @@ type TileBuilderOptions struct {
 	Concurrency  int
 }
 
-func createPathIfNotExists(path string) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		err = os.MkdirAll(path, os.ModePerm)
-		if err != nil {
-			return err
+// Option ...
+type Option func(*TileBuilder)
+
+// WithMaxCacheSize ...
+func WithMaxCacheSize(sizeInBytes int64) Option {
+	return func(ve *TileBuilder) {
+		ve.maxCacheSize = sizeInBytes
+	}
+}
+
+// WithMaxCacheSize ...
+func WithConcurrency(concurrency int) Option {
+	return func(ve *TileBuilder) {
+		if concurrency > runtime.NumCPU() {
+			ve.concurrency = runtime.NumCPU()
+		} else {
+			ve.concurrency = concurrency
 		}
 	}
-
-	return nil
 }
 
-func requiredBinaries() []string {
-	return []string{
-		"valhalla_build_admins",
-		"valhalla_build_config",
-		"valhalla_build_extract",
-		"valhalla_build_tiles",
-	}
-}
-
+// NewTileBuilder ...
 func NewTileBuilder(
-	logger *slog.Logger) (*TileBuilder, error) {
+	logger *slog.Logger, options ...Option) (*TileBuilder, error) {
 
 	opts := &TileBuilderOptions{}
 
@@ -82,13 +88,10 @@ func NewTileBuilder(
 
 	builder := &TileBuilder{executor: executor, logger: logger}
 	builder.concurrency = 2
-	if opts.Concurrency != 0 {
-		builder.concurrency = opts.Concurrency
-	}
-
 	builder.maxCacheSize = 700 * 1048576 // 700MiB
-	if opts.MaxCacheSize != 0 {
-		builder.maxCacheSize = opts.MaxCacheSize
+
+	for _, option := range options {
+		option(builder)
 	}
 
 	return builder, nil
@@ -121,6 +124,8 @@ func (ve *TileBuilder) prepareWorkspace(_ context.Context, dataset string, outpu
 	return nil
 }
 
+// BuildConfig builds the valhalla config required to build any of the following
+// entities such as Tiles, Extract or Admin
 func (ve *TileBuilder) BuildConfig(ctx context.Context, dataset string, outputPath string) error {
 	err := ve.prepareWorkspace(ctx, dataset, outputPath)
 	if err != nil {
@@ -161,6 +166,8 @@ func (ve *TileBuilder) BuildConfig(ctx context.Context, dataset string, outputPa
 	return nil
 }
 
+// BuildTiles starts a subprocess using valhalla_build_tiles to create
+// the valhalla tiles
 func (ve *TileBuilder) BuildTiles(ctx context.Context, dataset string, outputPath string) error {
 	if !ve.configCreated {
 		return fmt.Errorf("error, create config first")
@@ -187,6 +194,8 @@ func (ve *TileBuilder) BuildTiles(ctx context.Context, dataset string, outputPat
 	return nil
 }
 
+// BuildTilesExtracts starts a subprocess using valhalla_build_extract to
+// build a tar file containing previously generated valhalla_tiles
 func (ve *TileBuilder) BuildTilesExtract(ctx context.Context, dataset string, outputPath string) error {
 	if !ve.configCreated {
 		return fmt.Errorf("error, create config first")
@@ -217,6 +226,8 @@ func (ve *TileBuilder) BuildTilesExtract(ctx context.Context, dataset string, ou
 	return nil
 }
 
+// BuildTilesExtracts starts a subprocess using valhalla_build_admins to
+// build admins
 func (ve *TileBuilder) BuildAdmins(ctx context.Context, dataset string, outputPath string) error {
 	if !ve.configCreated {
 		return fmt.Errorf("error, create config first")
@@ -243,6 +254,7 @@ func (ve *TileBuilder) BuildAdmins(ctx context.Context, dataset string, outputPa
 	return nil
 }
 
+// Path returns the output path all working files are saved to.
 func (ve *TileBuilder) Path() (string, bool) {
 	if ve.path == "" {
 		return "", false
@@ -250,6 +262,7 @@ func (ve *TileBuilder) Path() (string, bool) {
 	return ve.path, true
 }
 
+// ExtractPath returns the output path for the valhalla tiles extract.
 func (ve *TileBuilder) ExtractPath() (string, bool) {
 	if ve.extractPath == "" {
 		return "", false
@@ -257,6 +270,7 @@ func (ve *TileBuilder) ExtractPath() (string, bool) {
 	return ve.extractPath, true
 }
 
+// AdminPath returns the output path for the admin file.
 func (ve *TileBuilder) AdminPath() (string, bool) {
 	if ve.adminPath == "" {
 		return "", false
@@ -264,6 +278,7 @@ func (ve *TileBuilder) AdminPath() (string, bool) {
 	return ve.adminPath, true
 }
 
+// TilesPath returns the output path for the tiles folder
 func (ve *TileBuilder) TilesPath() (string, bool) {
 	if ve.tilesPath == "" {
 		return "", false
@@ -278,4 +293,24 @@ func toDatasetFileName(dataset string) string {
 
 	parts := strings.Split(dataset, "/")
 	return parts[len(parts)-1] + "-latest.osm.pbf"
+}
+
+func createPathIfNotExists(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err = os.MkdirAll(path, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func requiredBinaries() []string {
+	return []string{
+		"valhalla_build_admins",
+		"valhalla_build_config",
+		"valhalla_build_extract",
+		"valhalla_build_tiles",
+	}
 }
