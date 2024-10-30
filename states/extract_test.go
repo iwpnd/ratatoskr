@@ -10,15 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (b *TestTileBuilder) BuildTilesExtract(ctx context.Context) error {
-	switch value := b.buildtilesextract.(type) {
-	case error:
-		return value
-	}
-
-	return nil
-}
-
 func TestExtractState(t *testing.T) {
 	logger := slog.New(slog.NewJSONHandler(io.Discard, nil))
 	ctx := context.Background()
@@ -31,7 +22,7 @@ func TestExtractState(t *testing.T) {
 	}{
 		{
 			name: "TileBuilder.BuildTilesExtract returns an Error",
-			params: NewParams("test", logger).
+			params: NewParams("test", "test", logger).
 				WithTileBuilder(
 					&TestTileBuilder{
 						buildtilesextract: fmt.Errorf("error during building extract"),
@@ -41,7 +32,7 @@ func TestExtractState(t *testing.T) {
 		},
 		{
 			name: "extractState returns compressState",
-			params: NewParams("test", logger).
+			params: NewParams("test", "test", logger).
 				WithTileBuilder(
 					&TestTileBuilder{},
 				),

@@ -7,30 +7,8 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/iwpnd/ratatoskr/services/tiles"
-
 	"github.com/stretchr/testify/assert"
 )
-
-type TestTileBuilder struct {
-	buildconfig       any
-	buildtiles        any
-	buildadmins       any
-	buildtilesextract any
-
-	path string
-
-	tiles.Builder
-}
-
-func (b *TestTileBuilder) BuildConfig(ctx context.Context) error {
-	switch value := b.buildconfig.(type) {
-	case error:
-		return value
-	}
-
-	return nil
-}
 
 func TestConfigState(t *testing.T) {
 	logger := slog.New(slog.NewJSONHandler(io.Discard, nil))
@@ -44,7 +22,7 @@ func TestConfigState(t *testing.T) {
 	}{
 		{
 			name: "TileBuilder.BuildConfig returns an Error",
-			params: NewParams("test", logger).
+			params: NewParams("test", "test", logger).
 				WithTileBuilder(
 					&TestTileBuilder{buildconfig: fmt.Errorf("error during config creation")},
 				),
@@ -52,7 +30,7 @@ func TestConfigState(t *testing.T) {
 		},
 		{
 			name: "configState returns buildState",
-			params: NewParams("test", logger).
+			params: NewParams("test", "test", logger).
 				WithTileBuilder(
 					&TestTileBuilder{},
 				),

@@ -10,14 +10,8 @@ import (
 	"github.com/iwpnd/go-geofabrik"
 )
 
-type GeofabrikDownloaderOptions struct {
-	Dataset    string
-	OutputPath string
-}
-
 type GeofabrikDownloader struct {
 	baseUrl string
-	opts    GeofabrikDownloaderOptions
 }
 
 func FileExists(filepath string) bool {
@@ -25,21 +19,19 @@ func FileExists(filepath string) bool {
 	return errors.Is(err, fs.ErrNotExist)
 }
 
-func NewGeofabrikDownloader(
-	opts GeofabrikDownloaderOptions,
-) *GeofabrikDownloader {
-	return &GeofabrikDownloader{opts: opts, baseUrl: "http://download.geofabrik.de"}
+func NewGeofabrikDownloader() *GeofabrikDownloader {
+	return &GeofabrikDownloader{baseUrl: "http://download.geofabrik.de"}
 }
 
-func (od *GeofabrikDownloader) Get(ctx context.Context) error {
+func (od *GeofabrikDownloader) Get(ctx context.Context, dataset string, outputPath string) error {
 	g, err := geofabrik.New(od.baseUrl)
 	if err != nil {
 		return fmt.Errorf("cannot instantiate geofabrik: %w", err)
 	}
 
-	err = g.Download(ctx, od.opts.Dataset, od.opts.OutputPath)
+	err = g.Download(ctx, dataset, outputPath)
 	if err != nil {
-		return fmt.Errorf("failed download from geofabrik dataset %s: %w", od.opts.Dataset, err)
+		return fmt.Errorf("failed download from geofabrik dataset %s: %w", dataset, err)
 	}
 
 	if ctx.Err() != nil {
@@ -49,15 +41,15 @@ func (od *GeofabrikDownloader) Get(ctx context.Context) error {
 	return nil
 }
 
-func (od *GeofabrikDownloader) MD5(ctx context.Context) (string, error) {
+func (od *GeofabrikDownloader) MD5(ctx context.Context, dataset string) (string, error) {
 	g, err := geofabrik.New(od.baseUrl)
 	if err != nil {
 		return "", fmt.Errorf("cannot instantiate geofabrik: %w", err)
 	}
 
-	md5, err := g.MD5(ctx, od.opts.Dataset)
+	md5, err := g.MD5(ctx, dataset)
 	if err != nil {
-		return "", fmt.Errorf("failed fetch MD5 from geofabrik dataset %s: %w", od.opts.Dataset, err)
+		return "", fmt.Errorf("failed fetch MD5 from geofabrik dataset %s: %w", dataset, err)
 	}
 
 	if ctx.Err() != nil {

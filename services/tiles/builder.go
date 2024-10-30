@@ -5,18 +5,19 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 	"time"
 )
 
 type Builder interface {
-	BuildConfig(context.Context) error
-	BuildTiles(context.Context) error
-	BuildTilesExtract(context.Context) error
-	BuildAdmins(context.Context) error
-	Path() string
-	AdminPath() string
-	ExtractPath() string
-	TilesPath() string
+	BuildConfig(ctx context.Context, dataset string, outputPath string) error
+	BuildTiles(ctx context.Context, dataset string, outputPath string) error
+	BuildTilesExtract(ctx context.Context, dataset string, outputPath string) error
+	BuildAdmins(ctx context.Context, dataset string, outputPath string) error
+	Path() (string, bool)
+	AdminPath() (string, bool)
+	ExtractPath() (string, bool)
+	TilesPath() (string, bool)
 }
 
 type TileBuilder struct {
@@ -41,8 +42,6 @@ type TileBuilderOptions struct {
 
 	MaxCacheSize int64
 	Concurrency  int
-	Path         string
-	Dataset      string
 }
 
 func createPathIfNotExists(path string) error {
@@ -66,8 +65,9 @@ func requiredBinaries() []string {
 }
 
 func NewTileBuilder(
-	opts *TileBuilderOptions,
 	logger *slog.Logger) (*TileBuilder, error) {
+
+	opts := &TileBuilderOptions{}
 
 	executor := &executor{
 		logger: logger,
@@ -91,32 +91,42 @@ func NewTileBuilder(
 		builder.maxCacheSize = opts.MaxCacheSize
 	}
 
-	if opts.Path != "" {
-		if opts.Dataset == "" {
-			return nil, fmt.Errorf("set path but missing dataset name")
-		}
-
-		err := createPathIfNotExists(opts.Path)
-		if err != nil {
-			return nil, fmt.Errorf("error creating basepath: %d", err)
-		}
-		builder.path = opts.Path
-		builder.tilesPath = builder.path + "/valhalla_tiles"
-		err = createPathIfNotExists(builder.tilesPath)
-		if err != nil {
-			return nil, fmt.Errorf("error creating valhalla_tiles path: %s", err)
-		}
-		builder.extractPath = builder.path + "/valhalla_tiles.tar"
-		builder.adminPath = builder.path + "/admin.sqlite"
-		builder.configPath = builder.path + "/config.json"
-		builder.datasetPath = builder.path + "/" + opts.Dataset
-		return builder, nil
-	}
-
 	return builder, nil
 }
 
-func (ve *TileBuilder) BuildConfig(ctx context.Context) error {
+func (ve *TileBuilder) prepareWorkspace(_ context.Context, dataset string, outputPath string) error {
+	if dataset == "" {
+		return fmt.Errorf("missing dataset")
+	}
+
+	if outputPath == "" {
+		return fmt.Errorf("missing outputPath")
+	}
+
+	err := createPathIfNotExists(outputPath)
+	if err != nil {
+		return fmt.Errorf("error creating basepath: %d", err)
+	}
+	ve.path = outputPath
+	ve.tilesPath = outputPath + "/valhalla_tiles"
+	err = createPathIfNotExists(ve.tilesPath)
+	if err != nil {
+		return fmt.Errorf("error creating valhalla_tiles path: %s", err)
+	}
+	ve.extractPath = ve.path + "/valhalla_tiles.tar"
+	ve.adminPath = ve.path + "/admin.sqlite"
+	ve.configPath = ve.path + "/config.json"
+	ve.datasetPath = ve.path + "/" + toDatasetFileName(dataset)
+
+	return nil
+}
+
+func (ve *TileBuilder) BuildConfig(ctx context.Context, dataset string, outputPath string) error {
+	err := ve.prepareWorkspace(ctx, dataset, outputPath)
+	if err != nil {
+		return err
+	}
+
 	params := []string{
 		"--mjolnir-concurrency", fmt.Sprint(ve.concurrency),
 		"--mjolnir-max-cache-size", fmt.Sprint(ve.maxCacheSize),
@@ -151,15 +161,20 @@ func (ve *TileBuilder) BuildConfig(ctx context.Context) error {
 	return nil
 }
 
-func (ve *TileBuilder) BuildTiles(ctx context.Context) error {
+func (ve *TileBuilder) BuildTiles(ctx context.Context, dataset string, outputPath string) error {
 	if !ve.configCreated {
 		return fmt.Errorf("error, create config first")
+	}
+
+	err := ve.prepareWorkspace(ctx, dataset, outputPath)
+	if err != nil {
+		return err
 	}
 
 	params := []string{"--config", ve.configPath, ve.datasetPath}
 	ve.logger.Info("started creating tiles", "params", params)
 
-	err := ve.executor.execute(ctx, "valhalla_build_tiles", params)
+	err = ve.executor.execute(ctx, "valhalla_build_tiles", params)
 	if err != nil {
 		return err
 	}
@@ -172,9 +187,14 @@ func (ve *TileBuilder) BuildTiles(ctx context.Context) error {
 	return nil
 }
 
-func (ve *TileBuilder) BuildTilesExtract(ctx context.Context) error {
+func (ve *TileBuilder) BuildTilesExtract(ctx context.Context, dataset string, outputPath string) error {
 	if !ve.configCreated {
 		return fmt.Errorf("error, create config first")
+	}
+
+	err := ve.prepareWorkspace(ctx, dataset, outputPath)
+	if err != nil {
+		return err
 	}
 
 	start := time.Now()
@@ -182,7 +202,7 @@ func (ve *TileBuilder) BuildTilesExtract(ctx context.Context) error {
 	params := []string{"--config", ve.configPath, "-O"}
 	ve.logger.Info("started tarballing tiles extract", "params", params)
 
-	err := ve.executor.execute(ctx, "valhalla_build_extract", params)
+	err = ve.executor.execute(ctx, "valhalla_build_extract", params)
 	if err != nil {
 		return err
 	}
@@ -197,15 +217,20 @@ func (ve *TileBuilder) BuildTilesExtract(ctx context.Context) error {
 	return nil
 }
 
-func (ve *TileBuilder) BuildAdmins(ctx context.Context) error {
+func (ve *TileBuilder) BuildAdmins(ctx context.Context, dataset string, outputPath string) error {
 	if !ve.configCreated {
 		return fmt.Errorf("error, create config first")
+	}
+
+	err := ve.prepareWorkspace(ctx, dataset, outputPath)
+	if err != nil {
+		return err
 	}
 
 	params := []string{"--config", ve.configPath, ve.datasetPath}
 	ve.logger.Info("started building admins", "params", params)
 
-	err := ve.executor.execute(ctx, "valhalla_build_admins", params)
+	err = ve.executor.execute(ctx, "valhalla_build_admins", params)
 	if err != nil {
 		return err
 	}
@@ -218,18 +243,39 @@ func (ve *TileBuilder) BuildAdmins(ctx context.Context) error {
 	return nil
 }
 
-func (ve *TileBuilder) Path() string {
-	return ve.path
+func (ve *TileBuilder) Path() (string, bool) {
+	if ve.path == "" {
+		return "", false
+	}
+	return ve.path, true
 }
 
-func (ve *TileBuilder) ExtractPath() string {
-	return ve.extractPath
+func (ve *TileBuilder) ExtractPath() (string, bool) {
+	if ve.extractPath == "" {
+		return "", false
+	}
+	return ve.extractPath, true
 }
 
-func (ve *TileBuilder) AdminPath() string {
-	return ve.adminPath
+func (ve *TileBuilder) AdminPath() (string, bool) {
+	if ve.adminPath == "" {
+		return "", false
+	}
+	return ve.adminPath, true
 }
 
-func (ve *TileBuilder) TilesPath() string {
-	return ve.tilesPath
+func (ve *TileBuilder) TilesPath() (string, bool) {
+	if ve.tilesPath == "" {
+		return "", false
+	}
+	return ve.tilesPath, true
+}
+
+func toDatasetFileName(dataset string) string {
+	if dataset == "" {
+		return ""
+	}
+
+	parts := strings.Split(dataset, "/")
+	return parts[len(parts)-1] + "-latest.osm.pbf"
 }
