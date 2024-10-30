@@ -24,22 +24,6 @@ func (c *TestCompressor) Compress(ctx context.Context, archive string, files ...
 
 }
 
-func (tb *TestTileBuilder) Path() string {
-	return tb.path
-}
-
-func (tb *TestTileBuilder) ExtractPath() string {
-	return tb.path
-}
-
-func (tb *TestTileBuilder) AdminPath() string {
-	return tb.path
-}
-
-func (tb *TestTileBuilder) TilesPath() string {
-	return tb.path
-}
-
 func TestCompressState(t *testing.T) {
 	logger := slog.New(slog.NewJSONHandler(io.Discard, nil))
 	ctx := context.Background()
@@ -52,8 +36,8 @@ func TestCompressState(t *testing.T) {
 	}{
 		{
 			name: "Compressor returns an Error",
-			params: NewParams("test", logger).
-				WithTileBuilder(&TestTileBuilder{path: "testpath"}).
+			params: NewParams("test", "test", logger).
+				WithTileBuilder(&TestTileBuilder{}).
 				WithCompression(&TestCompressor{
 					compress: fmt.Errorf("error during compression"),
 				}),
@@ -61,7 +45,7 @@ func TestCompressState(t *testing.T) {
 		},
 		{
 			name: "compressState returns nil",
-			params: NewParams("test", logger).
+			params: NewParams("test", "test", logger).
 				WithTileBuilder(&TestTileBuilder{path: "testpath"}).
 				WithCompression(&TestCompressor{}),
 			expectErr: false,
@@ -69,7 +53,7 @@ func TestCompressState(t *testing.T) {
 		},
 		{
 			name:      "No Compressor defined",
-			params:    NewParams("test", logger),
+			params:    NewParams("test", "test", logger),
 			expectErr: false,
 			wantState: nil,
 		},

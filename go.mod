@@ -3,7 +3,7 @@ module github.com/iwpnd/ratatoskr
 go 1.22.3
 
 require (
-	github.com/iwpnd/go-geofabrik v0.4.1
+	github.com/iwpnd/go-geofabrik v0.5.0
 	github.com/stretchr/testify v1.8.2
 )
 

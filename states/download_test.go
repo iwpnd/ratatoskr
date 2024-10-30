@@ -17,17 +17,27 @@ import (
 
 type TestDownloader struct {
 	get any
+	md5 any
 
 	download.Downloader
 }
 
-func (td *TestDownloader) Get(ctx context.Context) error {
+func (td *TestDownloader) Get(ctx context.Context, dataset string, outputPath string) error {
 	switch value := td.get.(type) {
 	case error:
 		return value
 	}
 
 	return nil
+}
+
+func (td *TestDownloader) MD5(ctx context.Context, dataset string) (string, error) {
+	switch value := td.md5.(type) {
+	case error:
+		return "", value
+	}
+
+	return td.md5.(string), nil
 }
 
 func methodName(method any) string {
@@ -52,25 +62,36 @@ func TestDownloadState(t *testing.T) {
 		wantState State[Params]
 	}{
 		{
-			name: "Downloader returns an Error",
-			params: NewParams("test", logger).
+			name: "Downloader returns an Error on Get",
+			params: NewParams("test", "test", logger).
 				WithDownload(
-					&TestDownloader{get: fmt.Errorf("error during download")},
+					&TestDownloader{
+						get: fmt.Errorf("error during MD5"),
+						md5: "md5",
+					},
 				),
 			expectErr: true,
 		},
 		{
-			name: "downloadState returns an configState",
-			params: NewParams("test", logger).
+			name: "Downloader returns an Error on Get",
+			params: NewParams("test", "test", logger).
 				WithDownload(
-					&TestDownloader{get: nil},
+					&TestDownloader{
+						get: fmt.Errorf("error during Get"),
+						md5: "md5",
+					},
 				),
-			expectErr: false,
-			wantState: ConfigState,
+			expectErr: true,
 		},
 		{
-			name:      "No Downloader defined",
-			params:    NewParams("test", logger),
+			name: "downloadState returns a configState",
+			params: NewParams("test", "test", logger).
+				WithDownload(
+					&TestDownloader{
+						get: nil,
+						md5: "md5",
+					},
+				),
 			expectErr: false,
 			wantState: ConfigState,
 		},

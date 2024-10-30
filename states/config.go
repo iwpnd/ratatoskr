@@ -6,14 +6,10 @@ import (
 )
 
 func ConfigState(ctx context.Context, params *Params) (*Params, State[Params], error) {
-	if params.builder == nil {
-		return params, nil, nil
-	}
-
-	params.logger.Info("starting config state", "name", params.name)
+	params.logger.Info("starting config state", "name", params.dataset)
 	start := time.Now()
 
-	err := params.builder.BuildConfig(ctx)
+	err := params.builder.BuildConfig(ctx, params.dataset, params.outputPath)
 	if err != nil {
 		return params, nil, &StateError{State: configState, Err: err}
 	}
@@ -21,7 +17,7 @@ func ConfigState(ctx context.Context, params *Params) (*Params, State[Params], e
 	elapsed := time.Since(start)
 	params.logger.Info(
 		"successfully finished config state",
-		"name", params.name,
+		"name", params.dataset,
 		"elapsed", elapsed.String(),
 	)
 	return params, BuildState, nil

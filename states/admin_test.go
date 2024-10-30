@@ -7,16 +7,87 @@ import (
 	"log/slog"
 	"testing"
 
+	"github.com/iwpnd/ratatoskr/services/tiles"
 	"github.com/stretchr/testify/assert"
 )
 
-func (b *TestTileBuilder) BuildAdmins(ctx context.Context) error {
-	switch value := b.buildadmins.(type) {
+type TestTileBuilder struct {
+	buildconfig       any
+	buildtiles        any
+	buildadmins       any
+	buildtilesextract any
+
+	path string
+
+	tiles.Builder
+}
+
+func (tb *TestTileBuilder) BuildConfig(
+	ctx context.Context,
+	dataset string,
+	outputPath string,
+) error {
+	switch value := tb.buildconfig.(type) {
 	case error:
 		return value
 	}
 
 	return nil
+}
+
+func (tb *TestTileBuilder) BuildAdmins(
+	ctx context.Context,
+	dataset string,
+	outputPath string,
+) error {
+	switch value := tb.buildadmins.(type) {
+	case error:
+		return value
+	}
+
+	return nil
+}
+
+func (tb *TestTileBuilder) BuildTilesExtract(
+	ctx context.Context,
+	dataset string,
+	outputPath string,
+) error {
+	switch value := tb.buildtilesextract.(type) {
+	case error:
+		return value
+	}
+
+	return nil
+}
+
+func (tb *TestTileBuilder) BuildTiles(
+	ctx context.Context,
+	dataset string,
+	outputPath string,
+) error {
+	switch value := tb.buildtiles.(type) {
+	case error:
+		return value
+	}
+
+	return nil
+}
+
+func (tb *TestTileBuilder) Path() (string, bool) {
+	return tb.path, true
+}
+
+func (tb *TestTileBuilder) ExtractPath() (string, bool) {
+	return tb.path, true
+}
+
+func (tb *TestTileBuilder) AdminPath() (string, bool) {
+	return tb.path, true
+}
+
+func (tb *TestTileBuilder) TilesPath() (string, bool) {
+	return tb.path, true
 }
 
 func TestAdminState(t *testing.T) {
@@ -31,7 +102,7 @@ func TestAdminState(t *testing.T) {
 	}{
 		{
 			name: "TileBuilder.BuildAdmins returns an Error",
-			params: NewParams("test", logger).
+			params: NewParams("test", "test", logger).
 				WithTileBuilder(
 					&TestTileBuilder{buildadmins: fmt.Errorf("error during building admins")},
 				),
@@ -39,7 +110,7 @@ func TestAdminState(t *testing.T) {
 		},
 		{
 			name: "adminState returns extractState",
-			params: NewParams("test", logger).
+			params: NewParams("test", "test", logger).
 				WithTileBuilder(
 					&TestTileBuilder{},
 				),

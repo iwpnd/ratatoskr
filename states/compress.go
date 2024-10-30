@@ -2,6 +2,7 @@ package states
 
 import (
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -10,15 +11,44 @@ func CompressState(ctx context.Context, params *Params) (*Params, State[Params],
 		return params, nil, nil
 	}
 
-	params.logger.Info("starting compression state", "name", params.name)
+	params.logger.Info("starting compression state", "name", params.dataset)
 	start := time.Now()
 
-	archive := params.builder.Path() + "/valhalla_tiles"
+	path, ok := params.builder.Path()
+	if !ok {
+		return params, nil, &StateError{
+			State: compressState,
+			Err:   fmt.Errorf("builder path (%s) does not exist", path),
+		}
+	}
+	tilesPath, ok := params.builder.TilesPath()
+	if !ok {
+		return params, nil, &StateError{
+			State: compressState,
+			Err:   fmt.Errorf("tiles path (%s) does not exist", tilesPath),
+		}
+	}
+	extractPath, ok := params.builder.ExtractPath()
+	if !ok {
+		return params, nil, &StateError{
+			State: compressState,
+			Err:   fmt.Errorf("extract path (%s) does not exist", tilesPath),
+		}
+	}
+	adminPath, ok := params.builder.AdminPath()
+	if !ok {
+		return params, nil, &StateError{
+			State: compressState,
+			Err:   fmt.Errorf("admin path (%s) does not exist", tilesPath),
+		}
+	}
+
+	archive := path + "/valhalla_tiles"
 	err := params.compressor.Compress(
 		ctx,
-		params.builder.TilesPath(),
-		params.builder.ExtractPath(),
-		params.builder.AdminPath(),
+		tilesPath,
+		extractPath,
+		adminPath,
 	)
 
 	if err != nil {
@@ -29,7 +59,7 @@ func CompressState(ctx context.Context, params *Params) (*Params, State[Params],
 	params.logger.Info(
 		"successfully finished compression state",
 		"name",
-		params.name,
+		params.dataset,
 		"archive", archive,
 		"elapsed", elapsed.String(),
 	)
