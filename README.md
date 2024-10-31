@@ -1,5 +1,7 @@
+> [!NOTE]
+> This is a work in progress fun side project :)
+ 
 # Ratatoskr
-
 The only thing that is somewhat of a hurdle to building your own
 routing microservices using the
 [valhalla routing engine](https://github.com/valhalla/valhalla) is the
@@ -10,9 +12,9 @@ routing tiles, compress the result and upload to blob storage. It can be used
 as a one off, or tied to a task workers, cronjobs or what have you.
 
 ## Requirement
-
 Requires you to have the valhalla executables in the environment you
-are running ratatoskr in.
+are running ratatoskr in. This can be the official Docker image
+or build from source. See [valhalla#installation](https://valhalla.github.io/valhalla/#installation).
 
 ```bash
 valhalla_build_config
