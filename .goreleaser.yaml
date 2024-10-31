@@ -1,10 +1,16 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
-project_name: valhalla-tile-builder
+version: 2
+project_name: ratatoskr
+builds:
+  - env:
+      - CGO_ENABLED=0
+    main: ./cmd/ratatoskr
+    binary: ratatoskr
+    goos:
+      - linux
+      - windows
+      - darwin
 checksum:
   name_template: "checksums.txt"
-builds:
-  - skip: true
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
 changelog:
@@ -13,6 +19,6 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
-# modelines, feel free to remove those if you don't want/use them:
-# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
-# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+      - "^chore:"
+      - "^chore(deps):"
+      - "^ci:"
