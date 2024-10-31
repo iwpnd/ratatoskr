@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// CompressState to compress valhalla routing tiles further
 func CompressState(ctx context.Context, params *Params) (*Params, State[Params], error) {
 	if params.compressor == nil {
 		return params, nil, nil

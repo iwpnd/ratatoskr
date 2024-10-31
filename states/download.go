@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// DownloadState to download OSM dataset
 func DownloadState(ctx context.Context, params *Params) (*Params, State[Params], error) {
 	params.logger.Info("starting download state", "name", params.dataset)
 

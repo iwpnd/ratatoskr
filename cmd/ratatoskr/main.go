@@ -52,7 +52,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	if buildMaxCacheSize != 0 {
-		options = append(options, tiles.WithMaxCacheSize(buildMaxCacheSize))
+		options = append(options, tiles.WithMaxCacheSizeInBytes(buildMaxCacheSize))
 	}
 
 	builder, err := tiles.NewTileBuilder(logger, options...)
@@ -79,14 +79,24 @@ func run(ctx context.Context, cmd *cli.Command) error {
 
 func init() {
 	runCommand = cli.Command{
-		Name:   "run",
-		Usage:  "run pipeline",
+		Name:  "run",
+		Usage: "run valhalla tiles pipeline",
+		Description: `Run the entire valhalla tiles pipeline
+
+        1. Download the dataset
+        2. Build a valhalla configuration file
+        3. Build valhalla routing tiles
+        4. Build valhalla routing tiles .tar file
+        5. Compress valhalla routing tiles .tar file
+        6. (optional, wip) upload to Blob Storage
+        `,
 		Action: run,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:     "outputpath",
-				Aliases:  []string{"o"},
-				Required: true,
+				Name:        "outputpath",
+				DefaultText: "test",
+				Aliases:     []string{"o"},
+				Required:    true,
 			},
 			&cli.StringFlag{
 				Name:     "dataset",
@@ -110,7 +120,7 @@ func init() {
 func main() {
 	cmd := &cli.Command{
 		Name:  "ratatoskr",
-		Usage: "ratatoskr",
+		Usage: "build valhalla routing engine routing tiles",
 		Commands: []*cli.Command{
 			&runCommand,
 		},

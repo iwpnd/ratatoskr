@@ -4,6 +4,7 @@ import (
 	"context"
 )
 
+// States ...
 type States int
 
 const (
@@ -15,6 +16,7 @@ const (
 	extractState
 )
 
+// String to resolve the actual state name
 func (s States) String() string {
 	switch s {
 	case adminState:
@@ -34,4 +36,5 @@ func (s States) String() string {
 	}
 }
 
+// State s in the pipeline state machine
 type State[T any] func(ctx context.Context, params *T) (*T, State[T], error)

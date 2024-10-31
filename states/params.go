@@ -12,6 +12,7 @@ import (
 	"github.com/iwpnd/ratatoskr/services/tiles"
 )
 
+// Params ...
 type Params struct {
 	dataset    string
 	basePath   string
@@ -24,6 +25,7 @@ type Params struct {
 	compressor compress.Compressor
 }
 
+// NewParams to build the pipeline parameters
 func NewParams(dataset string, basePath string, logger *slog.Logger) *Params {
 	return &Params{
 		dataset:  dataset,
@@ -54,6 +56,7 @@ func (p *Params) setOutputPath(dataset string, md5 string) error {
 	return nil
 }
 
+// Validate pipeline parameters prior to running the pipeline
 func (p *Params) Validate(ctx context.Context) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
@@ -78,16 +81,19 @@ func (p *Params) Validate(ctx context.Context) error {
 	return nil
 }
 
+// WithDownload to add a downloader to the pipeline parameters
 func (p *Params) WithDownload(downloader download.Downloader) *Params {
 	p.downloader = downloader
 	return p
 }
 
+// WithTileBuilder to add tile builder to the pipeline parameters
 func (p *Params) WithTileBuilder(builder tiles.Builder) *Params {
 	p.builder = builder
 	return p
 }
 
+// WithCompression to add a compressor to the pipeline parameters
 func (p *Params) WithCompression(compressor compress.Compressor) *Params {
 	p.compressor = compressor
 	return p

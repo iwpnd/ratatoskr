@@ -2,27 +2,22 @@ package download
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"io/fs"
-	"os"
 
 	"github.com/iwpnd/go-geofabrik"
 )
 
+// GeofabrikDownloader ...
 type GeofabrikDownloader struct {
 	baseUrl string
 }
 
-func FileExists(filepath string) bool {
-	_, err := os.Stat(filepath)
-	return errors.Is(err, fs.ErrNotExist)
-}
-
+// NewGeofabrikDownloader ...
 func NewGeofabrikDownloader() *GeofabrikDownloader {
 	return &GeofabrikDownloader{baseUrl: "http://download.geofabrik.de"}
 }
 
+// Get to download an OSM dataset to output path
 func (od *GeofabrikDownloader) Get(ctx context.Context, dataset string, outputPath string) error {
 	g, err := geofabrik.New(od.baseUrl)
 	if err != nil {
@@ -41,6 +36,7 @@ func (od *GeofabrikDownloader) Get(ctx context.Context, dataset string, outputPa
 	return nil
 }
 
+// MD5 to return an OSM dataset MD5 checksum
 func (od *GeofabrikDownloader) MD5(ctx context.Context, dataset string) (string, error) {
 	g, err := geofabrik.New(od.baseUrl)
 	if err != nil {
@@ -57,5 +53,4 @@ func (od *GeofabrikDownloader) MD5(ctx context.Context, dataset string) (string,
 	}
 
 	return md5, nil
-
 }

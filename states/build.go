@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// BuildState to build valhalla routing tiles from OSM dataset
 func BuildState(ctx context.Context, params *Params) (*Params, State[Params], error) {
 	params.logger.Info("starting build state", "name", params.dataset)
 	start := time.Now()

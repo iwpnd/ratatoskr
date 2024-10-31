@@ -6,6 +6,7 @@ import (
 	"github.com/iwpnd/ratatoskr/states"
 )
 
+// Execute the pipeline
 func Execute(ctx context.Context, params *states.Params) error {
 	if err := params.Validate(ctx); err != nil {
 		return err

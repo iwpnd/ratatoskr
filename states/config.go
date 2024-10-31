@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// ConfigState to create a valhalla config prior to building valhalla routing tiles
 func ConfigState(ctx context.Context, params *Params) (*Params, State[Params], error) {
 	params.logger.Info("starting config state", "name", params.dataset)
 	start := time.Now()

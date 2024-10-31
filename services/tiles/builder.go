@@ -51,8 +51,8 @@ type TileBuilderOptions struct {
 // Option ...
 type Option func(*TileBuilder)
 
-// WithMaxCacheSize ...
-func WithMaxCacheSize(sizeInBytes int64) Option {
+// WithMaxCacheSizeInBytes ...
+func WithMaxCacheSizeInBytes(sizeInBytes int64) Option {
 	return func(ve *TileBuilder) {
 		ve.maxCacheSize = sizeInBytes
 	}

@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// ExtractState to build a valhalla routing tiles .tar file
 func ExtractState(ctx context.Context, params *Params) (*Params, State[Params], error) {
 	params.logger.Info("starting tiles extract state", "name", params.dataset)
 	start := time.Now()

@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// AdminState to build admins from OSM dataset
 func AdminState(ctx context.Context, params *Params) (*Params, State[Params], error) {
 	params.logger.Info("starting admins state", "name", params.dataset)
 	start := time.Now()
