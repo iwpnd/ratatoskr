@@ -5,7 +5,7 @@ go 1.22.3
 require (
 	github.com/iwpnd/go-geofabrik v0.5.0
 	github.com/stretchr/testify v1.9.0
-	github.com/urfave/cli/v3 v3.0.0-alpha9.3
+	github.com/urfave/cli/v3 v3.0.0-beta1
 )
 
 require (
