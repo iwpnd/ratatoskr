@@ -44,15 +44,15 @@ func run(ctx context.Context, cmd *cli.Command) error {
 
 	options := []tiles.Option{}
 	if buildConcurrency != 0 {
-		if buildConcurrency > int64(runtime.NumCPU()) {
-			buildConcurrency = int64(runtime.NumCPU())
+		if buildConcurrency > runtime.NumCPU() {
+			buildConcurrency = runtime.NumCPU()
 
 			options = append(options, tiles.WithConcurrency(int(buildConcurrency)))
 		}
 	}
 
 	if buildMaxCacheSize != 0 {
-		options = append(options, tiles.WithMaxCacheSizeInBytes(buildMaxCacheSize))
+		options = append(options, tiles.WithMaxCacheSizeInBytes(int64(buildMaxCacheSize)))
 	}
 
 	builder, err := tiles.NewTileBuilder(logger, options...)
