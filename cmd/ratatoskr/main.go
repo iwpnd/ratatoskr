@@ -47,7 +47,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 		if buildConcurrency > runtime.NumCPU() {
 			buildConcurrency = runtime.NumCPU()
 
-			options = append(options, tiles.WithConcurrency(int(buildConcurrency)))
+			options = append(options, tiles.WithConcurrency(buildConcurrency))
 		}
 	}
 
