@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// Builder ...
+// Builder interface
 type Builder interface {
 	BuildConfig(ctx context.Context, dataset string, outputPath string) error
 	BuildTiles(ctx context.Context, dataset string, outputPath string) error
@@ -22,7 +22,7 @@ type Builder interface {
 	TilesPath() (string, bool)
 }
 
-// TileBuilder ...
+// TileBuilder struct
 type TileBuilder struct {
 	concurrency  int
 	maxCacheSize int64
@@ -40,7 +40,7 @@ type TileBuilder struct {
 	executor *executor
 }
 
-// TileBuilderOptions ...
+// TileBuilderOptions struct
 type TileBuilderOptions struct {
 	Debug bool
 
@@ -48,17 +48,17 @@ type TileBuilderOptions struct {
 	Concurrency  int
 }
 
-// Option ...
+// Option to use in options pattern.
 type Option func(*TileBuilder)
 
-// WithMaxCacheSizeInBytes ...
+// WithMaxCacheSizeInBytes to define custom max cache size in bytes.
 func WithMaxCacheSizeInBytes(sizeInBytes int64) Option {
 	return func(ve *TileBuilder) {
 		ve.maxCacheSize = sizeInBytes
 	}
 }
 
-// WithMaxCacheSize ...
+// WithConcurrency to define custom concurrency.
 func WithConcurrency(concurrency int) Option {
 	return func(ve *TileBuilder) {
 		if concurrency > runtime.NumCPU() {
@@ -69,10 +69,10 @@ func WithConcurrency(concurrency int) Option {
 	}
 }
 
-// NewTileBuilder ...
+// NewTileBuilder to instantiate a tile builder.
 func NewTileBuilder(
-	logger *slog.Logger, options ...Option) (*TileBuilder, error) {
-
+	logger *slog.Logger, options ...Option,
+) (*TileBuilder, error) {
 	opts := &TileBuilderOptions{}
 
 	executor := &executor{
@@ -97,7 +97,11 @@ func NewTileBuilder(
 	return builder, nil
 }
 
-func (ve *TileBuilder) prepareWorkspace(_ context.Context, dataset string, outputPath string) error {
+func (ve *TileBuilder) prepareWorkspace(
+	_ context.Context,
+	dataset string,
+	outputPath string,
+) error {
 	if dataset == "" {
 		return fmt.Errorf("missing dataset")
 	}
@@ -108,13 +112,13 @@ func (ve *TileBuilder) prepareWorkspace(_ context.Context, dataset string, outpu
 
 	err := createPathIfNotExists(outputPath)
 	if err != nil {
-		return fmt.Errorf("error creating basepath: %d", err)
+		return fmt.Errorf("error creating basepath: %w", err)
 	}
 	ve.path = outputPath
 	ve.tilesPath = outputPath + "/valhalla_tiles"
 	err = createPathIfNotExists(ve.tilesPath)
 	if err != nil {
-		return fmt.Errorf("error creating valhalla_tiles path: %s", err)
+		return fmt.Errorf("error creating valhalla_tiles path: %w", err)
 	}
 	ve.extractPath = ve.path + "/valhalla_tiles.tar"
 	ve.adminPath = ve.path + "/admin.sqlite"
@@ -126,7 +130,7 @@ func (ve *TileBuilder) prepareWorkspace(_ context.Context, dataset string, outpu
 
 // BuildConfig builds the valhalla config required to build any of the following
 // entities such as Tiles, Extract or Admin
-func (ve *TileBuilder) BuildConfig(ctx context.Context, dataset string, outputPath string) error {
+func (ve *TileBuilder) BuildConfig(ctx context.Context, dataset, outputPath string) error {
 	err := ve.prepareWorkspace(ctx, dataset, outputPath)
 	if err != nil {
 		return err
@@ -147,13 +151,13 @@ func (ve *TileBuilder) BuildConfig(ctx context.Context, dataset string, outputPa
 		return err
 	}
 
-	err = os.WriteFile(ve.configPath, output, 0644)
+	err = os.WriteFile(ve.configPath, output, 0o600)
 	if err != nil {
-		return fmt.Errorf("error creating valhalla config: %s", err)
+		return fmt.Errorf("error creating valhalla config: %w", err)
 	}
 
 	if _, err := os.Stat(ve.configPath); os.IsNotExist(err) {
-		return fmt.Errorf("error creating valhalla config: %s", err)
+		return fmt.Errorf("error creating valhalla config: %w", err)
 	}
 
 	ve.configCreated = true
@@ -168,7 +172,7 @@ func (ve *TileBuilder) BuildConfig(ctx context.Context, dataset string, outputPa
 
 // BuildTiles starts a subprocess using valhalla_build_tiles to create
 // the valhalla tiles
-func (ve *TileBuilder) BuildTiles(ctx context.Context, dataset string, outputPath string) error {
+func (ve *TileBuilder) BuildTiles(ctx context.Context, dataset, outputPath string) error {
 	if !ve.configCreated {
 		return fmt.Errorf("error, create config first")
 	}
@@ -196,7 +200,11 @@ func (ve *TileBuilder) BuildTiles(ctx context.Context, dataset string, outputPat
 
 // BuildTilesExtracts starts a subprocess using valhalla_build_extract to
 // build a tar file containing previously generated valhalla_tiles
-func (ve *TileBuilder) BuildTilesExtract(ctx context.Context, dataset string, outputPath string) error {
+func (ve *TileBuilder) BuildTilesExtract(
+	ctx context.Context,
+	dataset string,
+	outputPath string,
+) error {
 	if !ve.configCreated {
 		return fmt.Errorf("error, create config first")
 	}
@@ -228,7 +236,7 @@ func (ve *TileBuilder) BuildTilesExtract(ctx context.Context, dataset string, ou
 
 // BuildTilesExtracts starts a subprocess using valhalla_build_admins to
 // build admins
-func (ve *TileBuilder) BuildAdmins(ctx context.Context, dataset string, outputPath string) error {
+func (ve *TileBuilder) BuildAdmins(ctx context.Context, dataset, outputPath string) error {
 	if !ve.configCreated {
 		return fmt.Errorf("error, create config first")
 	}
@@ -297,7 +305,7 @@ func toDatasetFileName(dataset string) string {
 
 func createPathIfNotExists(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		err = os.MkdirAll(path, os.ModePerm)
+		err = os.MkdirAll(path, 0o600)
 		if err != nil {
 			return err
 		}

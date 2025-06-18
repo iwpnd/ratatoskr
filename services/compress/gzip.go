@@ -4,18 +4,35 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"context"
+	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 )
 
-// GzipCompressor ...
+// GzipCompressor implementing Compressor interface.
 type GzipCompressor struct{}
 
 func createGZipArchive(ctx context.Context, files []string, buf io.Writer) error {
+	var err error
+
 	gw := gzip.NewWriter(buf)
-	defer gw.Close()
+	defer func() {
+		if cerr := gw.Close(); cerr != nil {
+			if err == nil {
+				err = fmt.Errorf("closing gzip writer: %w", err)
+			}
+		}
+	}()
+
 	tw := tar.NewWriter(gw)
-	defer tw.Close()
+	defer func() {
+		if terr := tw.Close(); terr != nil {
+			if err == nil {
+				err = fmt.Errorf("closing tar writer: %w", err)
+			}
+		}
+	}()
 
 	for i := range files {
 		err := appendToArchive(ctx, tw, files[i])
@@ -27,12 +44,18 @@ func createGZipArchive(ctx context.Context, files []string, buf io.Writer) error
 	return nil
 }
 
-func appendToArchive(ctx context.Context, tw *tar.Writer, filename string) error {
-	file, err := os.Open(filename)
+func appendToArchive(_ context.Context, tw *tar.Writer, filename string) error {
+	file, err := os.Open(filepath.Clean(filename))
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		if ferr := file.Close(); ferr != nil {
+			if err == nil {
+				err = ferr
+			}
+		}
+	}()
 
 	info, err := file.Stat()
 	if err != nil {
@@ -65,11 +88,17 @@ func appendToArchive(ctx context.Context, tw *tar.Writer, filename string) error
 
 // Compress tages an archive and an array of file paths to compress into archive
 func (gz *GzipCompressor) Compress(ctx context.Context, archive string, files ...string) error {
-	out, err := os.Create(archive + ".tar.gz")
+	out, err := os.Create(filepath.Clean(archive + ".tar.gz"))
 	if err != nil {
 		return err
 	}
-	defer out.Close()
+	defer func() {
+		if cerr := out.Close(); cerr != nil {
+			if err == nil {
+				err = cerr
+			}
+		}
+	}()
 
 	err = createGZipArchive(ctx, files, out)
 	if err != nil {

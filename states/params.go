@@ -12,7 +12,7 @@ import (
 	"github.com/iwpnd/ratatoskr/services/tiles"
 )
 
-// Params ...
+// Params to be passed from state to state.
 type Params struct {
 	dataset    string
 	basePath   string
@@ -25,8 +25,8 @@ type Params struct {
 	compressor compress.Compressor
 }
 
-// NewParams to build the pipeline parameters
-func NewParams(dataset string, basePath string, logger *slog.Logger) *Params {
+// NewParams to build the pipeline parameters.
+func NewParams(dataset, basePath string, logger *slog.Logger) *Params {
 	return &Params{
 		dataset:  dataset,
 		basePath: basePath,
@@ -34,7 +34,7 @@ func NewParams(dataset string, basePath string, logger *slog.Logger) *Params {
 	}
 }
 
-func (p *Params) setOutputPath(dataset string, md5 string) error {
+func (p *Params) setOutputPath(dataset, md5 string) error { //nolint:unparam
 	path := []string{
 		strings.TrimRightFunc(
 			p.basePath, func(r rune) bool {

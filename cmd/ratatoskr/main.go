@@ -27,7 +27,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 	buildConcurrency := cmd.Int("build.concurrency")
 	buildMaxCacheSize := cmd.Int("build.maxCacheSize")
 
-	ctx, cancel := context.WithTimeout(ctx, time.Duration(time.Hour))
+	ctx, cancel := context.WithTimeout(ctx, time.Hour)
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	defer func() {
@@ -129,7 +129,7 @@ func main() {
 	ctx := context.Background()
 
 	if err := cmd.Run(ctx, os.Args); err != nil {
-		logger.Error("an error occured", "error", err)
+		logger.Error("an error occurred", "error", err)
 		os.Exit(1)
 	}
 }

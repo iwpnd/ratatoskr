@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-// States ...
+// States enum.
 type States int
 
 const (

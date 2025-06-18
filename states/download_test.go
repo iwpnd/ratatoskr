@@ -22,8 +22,8 @@ type TestDownloader struct {
 	download.Downloader
 }
 
-func (td *TestDownloader) Get(ctx context.Context, dataset string, outputPath string) error {
-	switch value := td.get.(type) {
+func (td *TestDownloader) Get(ctx context.Context, dataset, outputPath string) error {
+	switch value := td.get.(type) { //nolint:gocritic
 	case error:
 		return value
 	}
@@ -32,12 +32,12 @@ func (td *TestDownloader) Get(ctx context.Context, dataset string, outputPath st
 }
 
 func (td *TestDownloader) MD5(ctx context.Context, dataset string) (string, error) {
-	switch value := td.md5.(type) {
+	switch value := td.md5.(type) { //nolint:gocritic
 	case error:
 		return "", value
 	}
 
-	return td.md5.(string), nil
+	return td.md5.(string), nil //nolint:forcetypeassert
 }
 
 func methodName(method any) string {
@@ -53,7 +53,7 @@ func methodName(method any) string {
 
 func TestDownloadState(t *testing.T) {
 	logger := slog.New(slog.NewJSONHandler(io.Discard, nil))
-	ctx := context.Background()
+	ctx := t.Context()
 
 	tests := []struct {
 		name      string
@@ -113,6 +113,6 @@ func TestDownloadState(t *testing.T) {
 		gotState := methodName(nextState)
 		wantState := methodName(test.wantState)
 
-		assert.Equal(t, gotState, wantState)
+		assert.Equal(t, wantState, gotState)
 	}
 }

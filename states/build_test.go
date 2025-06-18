@@ -1,7 +1,6 @@
 package states
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"log/slog"
@@ -12,7 +11,7 @@ import (
 
 func TestBuildState(t *testing.T) {
 	logger := slog.New(slog.NewJSONHandler(io.Discard, nil))
-	ctx := context.Background()
+	ctx := t.Context()
 
 	tests := []struct {
 		name      string
@@ -57,6 +56,6 @@ func TestBuildState(t *testing.T) {
 		gotState := methodName(nextState)
 		wantState := methodName(test.wantState)
 
-		assert.Equal(t, gotState, wantState)
+		assert.Equal(t, wantState, gotState)
 	}
 }

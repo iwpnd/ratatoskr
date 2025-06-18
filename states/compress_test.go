@@ -15,18 +15,17 @@ type TestCompressor struct {
 }
 
 func (c *TestCompressor) Compress(ctx context.Context, archive string, files ...string) error {
-	switch value := c.compress.(type) {
+	switch value := c.compress.(type) { //nolint:gocritic
 	case error:
 		return value
 	}
 
 	return nil
-
 }
 
 func TestCompressState(t *testing.T) {
 	logger := slog.New(slog.NewJSONHandler(io.Discard, nil))
-	ctx := context.Background()
+	ctx := t.Context()
 
 	tests := []struct {
 		name      string
@@ -75,6 +74,6 @@ func TestCompressState(t *testing.T) {
 		gotState := methodName(nextState)
 		wantState := methodName(test.wantState)
 
-		assert.Equal(t, gotState, wantState)
+		assert.Equal(t, wantState, gotState)
 	}
 }

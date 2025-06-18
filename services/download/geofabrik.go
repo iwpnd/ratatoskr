@@ -7,18 +7,18 @@ import (
 	"github.com/iwpnd/go-geofabrik"
 )
 
-// GeofabrikDownloader ...
+// GeofabrikDownloader struct.
 type GeofabrikDownloader struct {
 	baseUrl string
 }
 
-// NewGeofabrikDownloader ...
+// NewGeofabrikDownloader to instantiate a geofarbik downloader.
 func NewGeofabrikDownloader() *GeofabrikDownloader {
 	return &GeofabrikDownloader{baseUrl: "http://download.geofabrik.de"}
 }
 
-// Get to download an OSM dataset to output path
-func (od *GeofabrikDownloader) Get(ctx context.Context, dataset string, outputPath string) error {
+// Get to download an OSM dataset to output path.
+func (od *GeofabrikDownloader) Get(ctx context.Context, dataset, outputPath string) error {
 	g, err := geofabrik.New(od.baseUrl)
 	if err != nil {
 		return fmt.Errorf("cannot instantiate geofabrik: %w", err)
