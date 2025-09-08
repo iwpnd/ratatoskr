@@ -4,7 +4,7 @@ go 1.24.1
 
 require (
 	github.com/iwpnd/go-geofabrik v0.5.0
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v3 v3.3.8
 )
 
