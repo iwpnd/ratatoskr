@@ -1,9 +1,9 @@
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/iwpnd/go-geofabrik v0.5.0 h1:utmVyuHLZ6dda5NnW7BNdwITf8JIvekIOtaq8ShLhUo=
-github.com/iwpnd/go-geofabrik v0.5.0/go.mod h1:GA2J7nwrC5wLW6IWD+8NVu2PP7sYeW/dcu+poe0yjqs=
-github.com/iwpnd/rip v0.7.0 h1:fWDxSjjxEmfa/qh84ZAl5jwh4rFHEKCMQ5Wxr5GlsLI=
-github.com/iwpnd/rip v0.7.0/go.mod h1:LkG8onQkvePn8ooHKRDHstPpWc61v+2mWa6S25n7Hic=
+github.com/iwpnd/go-geofabrik v0.6.3 h1:rejddXv8hlj2AZG1wpwxWhKyHT7ryxIu1EMUoRH6W9Q=
+github.com/iwpnd/go-geofabrik v0.6.3/go.mod h1:JWj1im95hSGsA8wHsRv/iQDA9ThoZQvf+/RTbnqX8nE=
+github.com/iwpnd/rip v0.7.1 h1:aiJt9AB4VkiSRtAfNVNJRQGeU0hD11c6R/HiWkqchhw=
+github.com/iwpnd/rip v0.7.1/go.mod h1:LYzzeCgh0xiDWZ/NHSI7wE8yQelRJUfiQ0nmR7qWmUA=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
