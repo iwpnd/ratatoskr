@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: setup go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
       - name: build
         run: go build ./cmd/ratatoskr
       - name: lint
