@@ -1,0 +1,29 @@
+name: dependabot auto-merge updates
+on:
+  pull_request:
+  pull_request_review:
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' || (github.event.review && github.event.pull_request.user.login == 'dependabot[bot]') }}
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2.4.0
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Auto-merge patch updates
+        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-patch' && github.event_name == 'pull_request' }}
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Auto-merge minor updates after approval
+        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-minor' && github.event_name == 'pull_request_review' && github.event.review.state == 'approved' }}
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
